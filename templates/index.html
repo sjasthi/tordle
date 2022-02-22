@@ -1,14 +1,110 @@
 {% extends 'base.html' %} {% block content %}
-<h1>Tordle</h1>
+
 <section class="game">
-    {%for i in range(1,7)%}
-    <div id="guess{{i}}" class="guess" data-letters="">
-        {%for j in range(1,6)%}
+    {%for i in range(1,(params.attempt + 1))%}
+    <div id="guess{{i}}" class="guess" data-letters="" style="grid-template-columns: repeat({{params.length}}, 1fr)">
+        {%for j in range(1,(params.length + 1))%}
         <div class="guess__tile" id="guess{{i}}Tile{{j}}"></div>
         {%endfor%}
     </div>
     {%endfor%}
 </section>
+<br>
+<div class="content-section">
+    <!-- <form method="POST" action="{{url_for(params.language)}}"> -->
+    <fieldset class="form-group">
+        <input id="input" maxlength="{{params.length}}" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="handleInput" autocomplete="off" name="word">
+    </fieldset>
+    <div class="form-group">
+        <button id="submit" onclick="onClick()" name="submit" class="btn btn-outline-info"> SUBMIT</button>
+    </div>
+    <!-- </form> -->
+</div>
+<script type="text/javascript">
+    const lettersPattern = /[a-z]/; // /^[A-Za-z][A-Za-z0-9]*$/;
+    let currentGuessCount = 1;
+    let currentGuess = document.querySelector('#guess' + currentGuessCount);
+    // let words = ['apple', 'baker', 'store', 'horse', 'speak', 'clone', 'bread'];
+    let words = JSON.parse('{{words | tojson | safe}}');
+    let solutionWord = words["solution"]
+    let guess_word = words["guess"]
+    let params = JSON.parse('{{params | tojson | safe}}');
+    console.log(params)
+    let word_size = params["length"]
+    let total_rol = params["attempt"]
+        // solutionWord = chooseWord(words)
+    console.log('solution word : ' + solutionWord + ', guess word: ' + guess_word);
 
-<section class="keyboard"></section>
-{% endblock content %}
+    const handleInput = () => {
+        // console.log(document.getElementById('input').value)
+        document.addEventListener('keydown', (e) => {
+            let keypress = e.key;
+
+            if (currentGuessCount <= total_rol) {
+                if (
+                    keypress.length == 1 &&
+                    lettersPattern.test(e.key) &&
+                    currentGuess.dataset.letters.length < word_size
+                ) {
+                    updateLetters(keypress, currentGuess);
+
+                } else if (e.key == 'Backspace' && currentGuess.dataset.letters != '') {
+                    deleteFromLetters(currentGuess, currentGuessCount);
+                } else if (e.key == 'Enter' && currentGuess.dataset.letters.length == word_size) {
+                    // document.querySelector("#submit");
+                    document.getElementById('input').value = "";
+                    submitGuess();
+                }
+            }
+        });
+    };
+    handleInput();
+    const onClick = () => {
+        if (currentGuessCount <= total_rol) {
+            if (currentGuess.dataset.letters.length == word_size) {
+                document.getElementById('input').value = "";
+                submitGuess();
+            }
+        }
+
+
+    };
+
+
+    const submitGuess = () => {
+        for (let i = 0; i < word_size; i++) {
+            setTimeout(() => {
+                revealTile(i, checkLetter(i, currentGuess, solutionWord));
+            }, i * 200);
+        }
+    };
+    const checkIfGuessComplete = (i) => {
+        if (i == (word_size - 1)) {
+            if (solutionWord == currentGuess.dataset.letters) {
+                // Win
+                setTimeout(() => {
+                    jumpTiles(word_size, currentGuessCount);
+                }, 500);
+                // document.querySelector("#submit");
+            } else {
+                // Not won
+                currentGuessCount = currentGuessCount + 1;
+                currentGuess = document.querySelector('#guess' + currentGuessCount);
+                if (currentGuessCount == total_rol + 1) {
+                    setTimeout(() => {
+                        showSolution(solutionWord);
+                    }, 500);
+                }
+            }
+        }
+    };
+    const revealTile = (i, state) => {
+        let tileNum = i + 1;
+        flipTile(tileNum, state);
+        checkIfGuessComplete(i);
+    };
+</script>
+
+
+
+<br> {% endblock content %}
