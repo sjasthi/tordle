@@ -12,24 +12,26 @@ words = {"solution": l[5], "guess": ""}
 def home():
     words["solution"] = l[int(request.args.get("length") or params["length"])]
     update_data(params, request, words)
+    words["solution"] = l[params["length"]]
+    print(params)
     print(words)
     return render_template("index.html", words=words, params=params)
 
 
-@app.route("/english", methods=["GET", "POST"])
-def english():
-    words["solution"] = l[int(request.args.get("length") or params["length"])]
-    update_data(params, request, words)
-    print(words)
-    return render_template("index.html", words=words, params=params)
+# @app.route("/english", methods=["GET", "POST"])
+# def english():
+#     update_data(params, request, words)
+#     words["solution"] = l[params["length"]]
+#     print(words)
+#     return render_template("index.html", words=words, params=params)
 
 
-@app.route("/telugu", methods=["GET", "POST"])
-def telugu():
-    words["solution"] = l[int(request.args.get("length") or params["length"])]
-    update_data(params, request, words, lang="telugu")
-    print(words)
-    return render_template("index.html", words=words, params=params)
+# @app.route("/telugu", methods=["GET", "POST"])
+# def telugu():
+#     words["solution"] = l[int(request.args.get("length") or params["length"])]
+#     update_data(params, request, words, lang="telugu")
+#     print(words)
+#     return render_template("index.html", words=words, params=params)
 
 
 if __name__ == "__main__":

@@ -1,24 +1,25 @@
 {% extends 'base.html' %} {% block content %}
-
-<section class="game">
-    {%for i in range(1,(params.attempt + 1))%}
-    <div id="guess{{i}}" class="guess" data-letters="" style="grid-template-columns: repeat({{params.length}}, 1fr)">
-        {%for j in range(1,(params.length + 1))%}
-        <div class="guess__tile" id="guess{{i}}Tile{{j}}"></div>
+<div class="center">
+    <section class="game">
+        {%for i in range(1,(params.attempt + 1))%}
+        <div id="guess{{i}}" class="guess" data-letters="" style="grid-template-columns: repeat({{params.length}}, 1fr)">
+            {%for j in range(1,(params.length + 1))%}
+            <div class="guess__tile" id="guess{{i}}Tile{{j}}"></div>
+            {%endfor%}
+        </div>
         {%endfor%}
+    </section>
+    <br>
+    <div class="content-section">
+
+        <fieldset class="form-group">
+            <input id="input" maxlength="{{params.length}}" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="handleInput" autocomplete="off" name="word">
+        </fieldset>
+        <div class="form-group">
+            <button id="submit" onclick="onClick()" name="submit" class="btn btn-outline-info"> SUBMIT</button>
+        </div>
+
     </div>
-    {%endfor%}
-</section>
-<br>
-<div class="content-section">
-    <!-- <form method="POST" action="{{url_for(params.language)}}"> -->
-    <fieldset class="form-group">
-        <input id="input" maxlength="{{params.length}}" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="handleInput" autocomplete="off" name="word">
-    </fieldset>
-    <div class="form-group">
-        <button id="submit" onclick="onClick()" name="submit" class="btn btn-outline-info"> SUBMIT</button>
-    </div>
-    <!-- </form> -->
 </div>
 <script type="text/javascript">
     const lettersPattern = /[a-z]/; // /^[A-Za-z][A-Za-z0-9]*$/;
