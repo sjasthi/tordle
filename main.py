@@ -9,47 +9,35 @@ telugus = ["సిరివెన్నెల"]
 guess_ts = [
     "తమిళభాష",
     "సిరివెన్నెల",
+    "వెన్నెలరేడు",
+    "వెన్నెలకాడు",
     "సరేవీనీలా",
     "వానలసిరి",
-    "వెన్నెలకాడు",
-    "వెన్నెలరేడు",
 ]
 
 params = {"length": 5, "attempt": 6, "language": "english"}
 words = {"solution": l[5], "guess": ""}
 
-# tt = getCharsFromAPI(telugus[0], "Telugu")
-# print(tt)
-# test = getCharsFromAPI(guess_ts[3], "Telugu")
-# print(test)
-# result = ""
-# if tt[1] == test[1]:
-#     for i in range(tt[1]):
-#         if tt[0][i] == test[0][i]:
-#             result += "1"
-#         else:
-#             result += "0"
-# print(result)
-# # utf8 = chr(38)
-# # ns = utf8.encode("utf8")
-# bi = "రి"[0]
-# # bi = r"{}".format(bii)
-# print(bi)
-# print("\u0c38\u0c3f\u0c30\u0c3f\u0c35")
+solution_tlg = getCharsFromAPI(telugus[0], "Telugu")
+# ans = getResult(solution_tlg, guess_ts[3])
+# print(ans)
 
 
 @app.route("/", methods=["GET", "POST"])
 def home():
     if request.form:
         print(request.form)
-        if request.form["language"] == "english":
+        if request.form["language"] == "English":
             words["solution"] = l[int(request.form["length"] or params["length"])]
             update_data(params, request, words)
-        else:
-            pass
-    words["solution"] = l[params["length"]]
-    print(params)
-    print(words)
+            print(words)
+        elif request.form["language"] == "Telugu":
+            update_data(params, request, words)
+            words["solution"] = getResult(solution_tlg, guess_ts[3])
+            print(words)
+    # words["solution"] = l[params["length"]]
+    # print(params)
+    # print(words)
     return render_template("index.html", words=words, params=params)
 
 
