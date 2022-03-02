@@ -1,25 +1,34 @@
 {% extends 'base.html' %} {% block content %}
-
-<section class="game">
-    {%for i in range(1,(params.attempt + 1))%}
-    <div id="guess{{i}}" class="guess" data-letters="" style="grid-template-columns: repeat({{params.length}}, 1fr)">
-        {%for j in range(1,(params.length + 1))%}
-        <div class="guess__tile" id="guess{{i}}Tile{{j}}"></div>
+<div class="center">
+    <section class="game">
+        {%for i in range(1,(params.attempt + 1))%}
+        <div id="guess{{i}}" class="guess" data-letters="" style="grid-template-columns: repeat({{params.length}}, 1fr)">
+            {%for j in range(1,(params.length + 1))%}
+            <div class="guess__tile" id="guess{{i}}Tile{{j}}"></div>
+            {%endfor%}
+        </div>
         {%endfor%}
+    </section>
+    <br>
+    <div class="content-section">
+        {% if params.language == 'English' %}
+        <fieldset class="form-group">
+            <input id="input" maxlength="{{params.length}}" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="handleInput" autocomplete="off" name="word">
+        </fieldset>
+        <div class="form-group">
+            <button id="submit" onclick="onClick()" name="submit" class="btn btn-outline-info"> SUBMIT</button>
+        </div>
+        {% elif params.language == 'Telugu' %}
+        <fieldset class="form-group">
+            <input id="input" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="teluguHandle" autocomplete="off" name="word">
+        </fieldset>
+        <div class="form-group">
+            <button id="submit" onclick="onClick()" name="submit" class="btn btn-outline-info"> SUBMIT</button>
+        </div>
+        {% endif %}
     </div>
-    {%endfor%}
-</section>
-<br>
-<div class="content-section">
-    <!-- <form method="POST" action="{{url_for(params.language)}}"> -->
-    <fieldset class="form-group">
-        <input id="input" maxlength="{{params.length}}" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="handleInput" autocomplete="off" name="word">
-    </fieldset>
-    <div class="form-group">
-        <button id="submit" onclick="onClick()" name="submit" class="btn btn-outline-info"> SUBMIT</button>
-    </div>
-    <!-- </form> -->
 </div>
+
 <script type="text/javascript">
     const lettersPattern = /[a-z]/; // /^[A-Za-z][A-Za-z0-9]*$/;
     let currentGuessCount = 1;
@@ -58,7 +67,35 @@
             }
         });
     };
-    handleInput();
+    const teluguHandle = () => {
+        // console.log(document.getElementById('input').value)
+        document.addEventListener('keydown', (e) => {
+            let keypress = e.key;
+
+            if (currentGuessCount <= total_rol) {
+                if (
+                    keypress.length == 1 &&
+                    lettersPattern.test(e.key) &&
+                    currentGuess.dataset.letters.length < word_size
+                ) {
+                    updateLetters(keypress, currentGuess);
+
+                } else if (e.key == 'Backspace' && currentGuess.dataset.letters != '') {
+                    deleteFromLetters(currentGuess, currentGuessCount);
+                } else if (e.key == 'Enter' && currentGuess.dataset.letters.length == word_size) {
+                    // document.querySelector("#submit");
+                    document.getElementById('input').value = "";
+                    submitGuess();
+                }
+            }
+        });
+    };
+    if (params["language"] === "English") {
+        handleInput();
+    } else if (params["language"] === "Telugu") {
+        teluguHandle();
+    }
+
     const onClick = () => {
         if (currentGuessCount <= total_rol) {
             if (currentGuess.dataset.letters.length == word_size) {
@@ -66,8 +103,6 @@
                 submitGuess();
             }
         }
-
-
     };
 
 
@@ -104,7 +139,6 @@
         checkIfGuessComplete(i);
     };
 </script>
-
 
 
 <br> {% endblock content %}

@@ -112,7 +112,7 @@ html {
 }
 
 body {
-    align-items: center;
+    /* align-items: center; 
     background-color: #111112;
     color: #fff;
     display: flex;
@@ -121,6 +121,9 @@ body {
     margin: 0;
     padding: 1rem 2rem;
     text-transform: uppercase
+    */
+    background-color: #111112;
+    color: #fff;
 }
 
 h1,
@@ -131,7 +134,7 @@ h3 {
 }
 
 h1 {
-    font-size: 2.25rem;
+    font-size: 3.25rem;
     letter-spacing: .125rem
 }
 
@@ -147,13 +150,14 @@ a:visited {
     padding: 0 1.5rem
 }
 
-@media (min-width:71.875em) {
+
+/* @media (min-width:71.875em) {
     .container {
         padding: 0;
         -webkit-transform: translate(0);
         transform: translate(0)
     }
-}
+} */
 
 .guess {
     display: grid;
@@ -197,6 +201,95 @@ a:visited {
     background-color: #111112;
     color: #fff;
     border-color: #111112;
+}
+
+.modal {
+    background: #111112;
+    background-color: transparent;
+}
+
+.modal-header {
+    background-color: #111112;
+    color: #fff;
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    -webkit-border-top-left-radius: 0;
+    -webkit-border-top-right-radius: 0;
+    -moz-border-radius-topleft: 0;
+    -moz-border-radius-topright: 0;
+}
+
+.modal-body {
+    background: #111112;
+    /* width: 350px;
+    margin: 0 auto; */
+}
+
+.modal-footer {
+    background: #111112;
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+    -webkit-border-bottom-left-radius: 0;
+    -webkit-border-bottom-right-radius: 0;
+    -moz-border-radius-bottomleft: 0;
+    -moz-border-radius-bottomright: 0;
+}
+
+
+/* .modal-backdrop {
+    background: #111112;
+} */
+
+.nav-right {
+    margin: auto;
+    position: absolute;
+    right: 30px;
+}
+
+.nav-center {
+    margin: auto;
+    position: center;
+    font-weight: 700;
+    /* font-size: 100px; */
+    /* padding: 1rem 2rem; */
+    font-size: 3.25rem;
+    /* text-transform: uppercase */
+}
+
+.nav-left {
+    margin: auto;
+    position: absolute;
+    left: 30px;
+    color: #fff !important;
+}
+
+.center {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    font-weight: 600;
+    margin: 0;
+    padding: 1rem 2rem;
+    text-transform: uppercase
+}
+
+.form-control {
+    background-color: #111112 !important;
+    border-color: #595959 !important;
+    color: #fff !important;
+}
+
+footer {
+    margin: auto;
+    position: absolute;
+    bottom: 5px;
+    /* width: 100%;
+    height: 2.5rem; */
+    padding: 1rem 2rem;
+}
+
+.close {
+    color: #fff;
 }
 
 
