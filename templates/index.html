@@ -11,21 +11,25 @@
     </section>
     <br>
     <div class="content-section">
-        {% if params.language == 'English' %}
-        <fieldset class="form-group">
-            <input id="input" maxlength="{{params.length}}" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="handleInput" autocomplete="off" name="word">
-        </fieldset>
-        <div class="form-group">
-            <button id="submit" onclick="onClick()" name="submit" class="btn btn-outline-info"> SUBMIT</button>
-        </div>
-        {% elif params.language == 'Telugu' %}
-        <fieldset class="form-group">
-            <input id="input" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="teluguHandle" autocomplete="off" name="word">
-        </fieldset>
-        <div class="form-group">
-            <button id="submit" onclick="onClick()" name="submit" class="btn btn-outline-info"> SUBMIT</button>
-        </div>
-        {% endif %}
+
+        {% if params and params.language == 'Telugu' %} {% if words.wordCount
+        < params.length %} <form action="{{ url_for('home')}}" method="post">
+            <fieldset class="form-group">
+                <input id="input" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="teluguHandle" autocomplete="off" name="word">
+            </fieldset>
+            <div class="form-group">
+                <button type="submit" id="submit" onclick="onClickTelugu()" class="btn btn-outline-info"> SUBMIT</button>
+            </div>
+            </form>
+            {%else%}
+            <button type="submit" id="again" onclick="document.getElementById('go').click()" class="btn btn-outline-info">PLAY AGAIN</button> {%endif%} {% else %}
+            <fieldset class="form-group">
+                <input id="input" maxlength="{{params.length}}" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="handleInput" autocomplete="off" name="word">
+            </fieldset>
+            <div class="form-group">
+                <button id="submit" onclick="onClick()" name="submit" class="btn btn-outline-info"> SUBMIT</button>
+            </div>
+            {% endif %}
     </div>
 </div>
 
@@ -35,14 +39,16 @@
     let currentGuess = document.querySelector('#guess' + currentGuessCount);
     // let words = ['apple', 'baker', 'store', 'horse', 'speak', 'clone', 'bread'];
     let words = JSON.parse('{{words | tojson | safe}}');
+    console.log(words)
     let solutionWord = words["solution"]
-    let guess_word = words["guess"]
+    let guess_word = words["result"]
     let params = JSON.parse('{{params | tojson | safe}}');
     console.log(params)
     let word_size = params["length"]
     let total_rol = params["attempt"]
+        // let inputWord = document.getElementById('input').value;
         // solutionWord = chooseWord(words)
-    console.log('solution word : ' + solutionWord + ', guess word: ' + guess_word);
+        // console.log('solution word : ' + solutionWord + ', guess word: ' + guess_word);
 
     const handleInput = () => {
         // console.log(document.getElementById('input').value)
@@ -64,32 +70,47 @@
                     document.getElementById('input').value = "";
                     submitGuess();
                 }
+            } else {
+                again();
             }
         });
     };
+    const again = () => {
+        var input = document.getElementById("input");
+        input.remove();
+        var button = document.getElementById("submit");
+        button.innerHTML = "PLAY AGAIN"
+        button.setAttribute('ID', 'again');
+        button.setAttribute('onclick', "document.getElementById('go').click()")
+    }
+
     const teluguHandle = () => {
         // console.log(document.getElementById('input').value)
-        document.addEventListener('keydown', (e) => {
-            let keypress = e.key;
-
-            if (currentGuessCount <= total_rol) {
-                if (
-                    keypress.length == 1 &&
-                    lettersPattern.test(e.key) &&
-                    currentGuess.dataset.letters.length < word_size
-                ) {
-                    updateLetters(keypress, currentGuess);
-
-                } else if (e.key == 'Backspace' && currentGuess.dataset.letters != '') {
-                    deleteFromLetters(currentGuess, currentGuessCount);
-                } else if (e.key == 'Enter' && currentGuess.dataset.letters.length == word_size) {
-                    // document.querySelector("#submit");
-                    document.getElementById('input').value = "";
-                    submitGuess();
-                }
+        if (words["word_len_test"] == false) {
+            document.getElementById('input').value = words["word_input"];
+        } else {
+            console.log(guess_word);
+            for (let i = 0; i < word_size; i++) {
+                updateTiles(i + 1, guess_word[0]["tlg_arr"][i]);
             }
-        });
+            if (guess_word["status"] === "SUCCESS") {
+                document.getElementById('input').value = "";
+                submitTelugu();
+            } else {
+                document.getElementById('input').value = words["word_input"];
+                submitTelugu();
+            }
+        }
+
     };
+    const submitTelugu = () => {
+        for (let i = 0; i < word_size; i++) {
+            setTimeout(() => {
+                revealTile(i, checkTelugu(i, guess_word));
+            }, i * 200);
+        }
+    };
+
     if (params["language"] === "English") {
         handleInput();
     } else if (params["language"] === "Telugu") {
@@ -104,7 +125,11 @@
             }
         }
     };
+    const onClickTelugu = () => {
+        // console.log("sjdfhhhahaha")
+        //  console.log(document.getElementById('input').value)
 
+    };
 
     const submitGuess = () => {
         for (let i = 0; i < word_size; i++) {
@@ -120,6 +145,7 @@
                 setTimeout(() => {
                     jumpTiles(word_size, currentGuessCount);
                 }, 500);
+                again();
                 // document.querySelector("#submit");
             } else {
                 // Not won
@@ -129,6 +155,7 @@
                     setTimeout(() => {
                         showSolution(solutionWord);
                     }, 500);
+                    again();
                 }
             }
         }

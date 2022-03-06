@@ -20,7 +20,16 @@ const flipTile = (tileNum, state) => {
         tile.classList.remove('flip-out');
     }, 1500);
 };
-
+const checkTelugu = (position, guess_word) => {
+    result = {
+        0: "absent",
+        1: "correct",
+        2: "present",
+        3: "correct-base",
+        4: "present-base"
+    };
+    return result[guess_word[0]["color_arr"][position]];
+};
 const checkLetter = (position, currentGuess, solutionWord) => {
     //console.log('checkLetter');
     let guessedLetter = currentGuess.dataset.letters.charAt(position);
@@ -37,6 +46,7 @@ const checkLetter = (position, currentGuess, solutionWord) => {
     }
 
 };
+
 
 const showSolution = (solutionWord) => {
     alert('Better luck next time. The solution was: ' + solutionWord);

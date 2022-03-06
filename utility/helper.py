@@ -8,7 +8,12 @@ def update_data(params, request, words):
     params["length"] = int(request.form["length"] or params["length"])
     params["attempt"] = int(request.form["attempt"] or params["attempt"])
     params["language"] = (request.form["language"]) or params["language"]
-    words["guess"] = request.form.get("word") or words["guess"]
+    words["result"] = []
+    words["word_input"] = ""
+    words["wordCount"] = 0
+
+
+# words = {"solution": l[5], "result": [], "word_input": "", "wordCount": 0}
 
 
 def getCharsFromAPI(string, language):
@@ -31,10 +36,15 @@ def getCharsFromAPI(string, language):
     return data["data"]
 
 
-def getResult(solution_tlg, guess):
+STATUS = ["PROCESS", "SUCCESS", "END"]
+
+
+def getResult(words):
+    solution_tlg = words["solution"]
     n = len(solution_tlg)
-    guess_tlg = getCharsFromAPI(guess, "Telugu")
+    guess_tlg = getCharsFromAPI(words["word_input"], "Telugu")
     if n == len(guess_tlg):
+        words["word_len_test"] = True
         solution_base = [x[0] for x in solution_tlg]
         guess_base = [x[0] for x in guess_tlg]
         result = [0] * n
@@ -56,5 +66,24 @@ def getResult(solution_tlg, guess):
                     ):
                         result[i] = 4
                         break
-        return [guess_tlg, result]
-    return []
+        if result == [1] * n:
+            words["result"].append(
+                {
+                    "color_arr": result,
+                    "tlg_arr": guess_tlg,
+                    "status": STATUS[1],
+                }
+            )
+            words["wordCount"] += 1
+        else:
+            words["result"].append(
+                {
+                    "color_arr": result,
+                    "tlg_arr": guess_tlg,
+                    "status": STATUS[0],
+                }
+            )
+            words["wordCount"] += 1
+    else:
+        words["word_len_test"] = False
+        # words["result"].append([guess_tlg, result])
