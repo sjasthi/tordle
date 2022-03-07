@@ -11,14 +11,17 @@
     </section>
     <br>
     <div class="content-section">
-
         {% if params and params.language == 'Telugu' %} {% if words.wordCount
-        < params.length %} <form action="{{ url_for('home')}}" method="post">
+        <params.attempt and words.status=='PROCESS' %} <form action="{{ url_for('home')}}" method="post">
             <fieldset class="form-group">
                 <input id="input" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="teluguHandle" autocomplete="off" name="word">
             </fieldset>
             <div class="form-group">
-                <button type="submit" id="submit" onclick="onClickTelugu()" class="btn btn-outline-info"> SUBMIT</button>
+                <button type="submit" id="submit" onclick="onClickTelugu()" class="btn btn-outline-info"> SUBMIT</button> {% if words.word_len_test==False %}
+                <div class="requirements">
+                    Must be a valid Word!
+                </div>
+                {% endif %}
             </div>
             </form>
             {%else%}
@@ -37,7 +40,6 @@
     const lettersPattern = /[a-z]/; // /^[A-Za-z][A-Za-z0-9]*$/;
     let currentGuessCount = 1;
     let currentGuess = document.querySelector('#guess' + currentGuessCount);
-    // let words = ['apple', 'baker', 'store', 'horse', 'speak', 'clone', 'bread'];
     let words = JSON.parse('{{words | tojson | safe}}');
     console.log(words)
     let solutionWord = words["solution"]
@@ -46,15 +48,63 @@
     console.log(params)
     let word_size = params["length"]
     let total_rol = params["attempt"]
-        // let inputWord = document.getElementById('input').value;
-        // solutionWord = chooseWord(words)
-        // console.log('solution word : ' + solutionWord + ', guess word: ' + guess_word);
 
+    const teluguHandle = () => {
+        if (words["word_len_test"] == false) {
+            setTitleTelugu(guess_word.length);
+            document.getElementById('input').value = words["word_input"];
+        } else {
+            if (guess_word.length == 1) {
+                setTilesTeluguForFlip(0);
+                if (words["status"] === "SUCCESS") { // Win
+                    submitTelugu(0);
+                    setTimeout(() => {
+                        jumpTiles(word_size, 1);
+                    }, 500);
+                } else {
+                    document.getElementById('input').value = words["word_input"];
+                    submitTelugu(0);
+                }
+            } else if (guess_word.length > 1) {
+                let n = guess_word.length - 1;
+                setTitleTelugu(n);
+                setTilesTeluguForFlip(n);
+                if (words["status"] === "SUCCESS") { // Win
+                    submitTelugu(n);
+                    setTimeout(() => {
+                        jumpTiles(word_size, n + 1);
+                    }, 500);
+                } else {
+                    if (guess_word.length < total_rol) {
+                        document.getElementById('input').value = words["word_input"];
+                    }
+                    submitTelugu(n);
+                }
+            }
+        }
+    };
+    const setTilesTeluguForFlip = (m) => {
+        for (let j = 0; j < word_size; j++) {
+            updateTilesTeluguForFlip(m, j, guess_word[m]["tlg_arr"][j], guess_word[m]["color_arr"][j]);
+        }
+    };
+    const setTitleTelugu = (m) => {
+        for (let i = 0; i < m; i++) {
+            for (let j = 0; j < word_size; j++) {
+                updateTilesTelugu(i, j, guess_word[i]["tlg_arr"][j], guess_word[i]["color_arr"][j])
+            }
+        }
+    };
+    const submitTelugu = (n) => {
+        for (let i = 0; i < word_size; i++) {
+            setTimeout(() => {
+                revealTileTelugu(n, i, checkTelugu(i, n, guess_word));
+            }, i * 200);
+        }
+    };
     const handleInput = () => {
-        // console.log(document.getElementById('input').value)
         document.addEventListener('keydown', (e) => {
             let keypress = e.key;
-
             if (currentGuessCount <= total_rol) {
                 if (
                     keypress.length == 1 &&
@@ -62,11 +112,9 @@
                     currentGuess.dataset.letters.length < word_size
                 ) {
                     updateLetters(keypress, currentGuess);
-
                 } else if (e.key == 'Backspace' && currentGuess.dataset.letters != '') {
                     deleteFromLetters(currentGuess, currentGuessCount);
                 } else if (e.key == 'Enter' && currentGuess.dataset.letters.length == word_size) {
-                    // document.querySelector("#submit");
                     document.getElementById('input').value = "";
                     submitGuess();
                 }
@@ -83,40 +131,11 @@
         button.setAttribute('ID', 'again');
         button.setAttribute('onclick', "document.getElementById('go').click()")
     }
-
-    const teluguHandle = () => {
-        // console.log(document.getElementById('input').value)
-        if (words["word_len_test"] == false) {
-            document.getElementById('input').value = words["word_input"];
-        } else {
-            console.log(guess_word);
-            for (let i = 0; i < word_size; i++) {
-                updateTiles(i + 1, guess_word[0]["tlg_arr"][i]);
-            }
-            if (guess_word["status"] === "SUCCESS") {
-                document.getElementById('input').value = "";
-                submitTelugu();
-            } else {
-                document.getElementById('input').value = words["word_input"];
-                submitTelugu();
-            }
-        }
-
-    };
-    const submitTelugu = () => {
-        for (let i = 0; i < word_size; i++) {
-            setTimeout(() => {
-                revealTile(i, checkTelugu(i, guess_word));
-            }, i * 200);
-        }
-    };
-
     if (params["language"] === "English") {
         handleInput();
     } else if (params["language"] === "Telugu") {
         teluguHandle();
     }
-
     const onClick = () => {
         if (currentGuessCount <= total_rol) {
             if (currentGuess.dataset.letters.length == word_size) {
@@ -125,12 +144,7 @@
             }
         }
     };
-    const onClickTelugu = () => {
-        // console.log("sjdfhhhahaha")
-        //  console.log(document.getElementById('input').value)
-
-    };
-
+    const onClickTelugu = () => {};
     const submitGuess = () => {
         for (let i = 0; i < word_size; i++) {
             setTimeout(() => {
@@ -146,7 +160,6 @@
                     jumpTiles(word_size, currentGuessCount);
                 }, 500);
                 again();
-                // document.querySelector("#submit");
             } else {
                 // Not won
                 currentGuessCount = currentGuessCount + 1;
@@ -159,6 +172,9 @@
                 }
             }
         }
+    };
+    const revealTileTelugu = (row, col, state) => {
+        flipTileTelugu(row, col, state);
     };
     const revealTile = (i, state) => {
         let tileNum = i + 1;
