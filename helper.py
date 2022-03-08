@@ -41,8 +41,8 @@ def update_data(params, request, words):
 def getCharsFromAPI(string, language):
     """@string: String for api params
     @language: String for api params"""
-    # URL_char = "https://indic-wp.thisisjava.com/api/getLogicalChars.php"
-    URL_char = "http://localhost/indic-wp//api/getLogicalChars.php"
+    URL_char = "https://indic-wp.thisisjava.com/api/getLogicalChars.php"
+    # URL_char = "http://localhost/indic-wp//api/getLogicalChars.php"
     params = {"string": string, "language": language}
     headers = {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"
