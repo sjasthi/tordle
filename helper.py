@@ -3,6 +3,7 @@
 import requests
 import json
 from models import *
+from telugu import getTeluguLogicalChars
 
 
 params = {"length": 5, "attempt": 6, "language": "English"}
@@ -68,7 +69,7 @@ def getResult(words):
     if words["word_input"] == "":
         words["word_len_test"] = False
         return
-    guess_tlg = getCharsFromAPI(words["word_input"], "Telugu")
+    guess_tlg = getTeluguLogicalChars(words["word_input"])
     if n == len(guess_tlg):
         words["word_len_test"] = True
         solution_base = [x[0] for x in solution_tlg]
@@ -133,7 +134,7 @@ def teluguFile2db(file, db, Telugu):
     with open(file, "r") as f:
         for line in f:
             word = line.strip()
-            l = getCharsFromAPI(word, "Telugu")
+            l = getTeluguLogicalChars(word)
             size = len(l)
             l_str = json.dumps(l)
             tlg = Telugu(word=word, length=size, list_str=l_str)
@@ -142,7 +143,7 @@ def teluguFile2db(file, db, Telugu):
 
     # for t in guess_ts:
     #     word = t.strip()
-    #     l = getCharsFromAPI(word, "Telugu")
+    #     l = getTeluguLogicalChars(word)
     #     size = len(l)
     #     l_str = json.dumps(l)
     #     tlg = Telugu(word=word, length=size, list_str=l_str)
