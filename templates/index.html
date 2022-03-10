@@ -1,5 +1,5 @@
 {% extends 'base.html' %} {% block content %}
-<div class="center">
+<div id="image" class="center">
     <section class="game">
         {%for i in range(1,(params.attempt + 1))%}
         <div id="guess{{i}}" class="guess" data-letters="" style="grid-template-columns: repeat({{params.length}}, 1fr)">
@@ -25,14 +25,35 @@
             </div>
             </form>
             {%else%}
-            <button type="submit" id="again" onclick="document.getElementById('go').click()" class="btn btn-outline-info">PLAY AGAIN</button> {%endif%} {% else %}
+            <button type="submit" id="again" onclick="document.getElementById('go').click()" class="btn btn-outline-info">PLAY AGAIN</button> {%if words.status=='SUCCESS' %}
+            <button type="submit" id="share" data-toggle="modal" data-target="#ModalShare" onclick="screenshot()" class="btn btn-outline-info">SHARE</button> {%endif%} {%endif%} {% else %}
             <fieldset class="form-group">
                 <input id="input" maxlength="{{params.length}}" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="handleInput" autocomplete="off" name="word">
             </fieldset>
-            <div class="form-group">
+            <div id="share_btn" class="form-group">
                 <button id="submit" onclick="onClick()" name="submit" class="btn btn-outline-info"> SUBMIT</button>
             </div>
             {% endif %}
+            <!-- start image Modal -->
+            <div class="modal fade" id="ModalShare" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLongTitle">Screenshot Share</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+                        </div>
+                        <div id="canvas" class="modal-body">
+                        </div>
+                        <div class="modal-footer">
+                            <a id="download" download="myImage.jpg" class="btn btn-outline-info" href="" onclick="download_img(this);">Download</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- end image Modal -->
     </div>
 </div>
 
@@ -48,6 +69,32 @@
     console.log(params)
     let word_size = params["length"]
     let total_rol = params["attempt"]
+    var canvas_save = null;
+    // Screenshot img
+    const screenshot = () => {
+        html2canvas(document.getElementById('image')).then(function(canvas) {
+            document.getElementById('canvas').appendChild(canvas);
+            canvas_save = canvas;
+        });
+    }
+
+    // download img
+    //  window.onload = init();
+    // var canvas = document.getElementById("canvas");
+
+    //   var ctx = canvas.getContext("2d");
+    //  var ox = canvas.width;
+    // var oy = canvas.height;
+    // ctx.font = "42px serif";
+    // ctx.textAlign = "center";
+    //ctx.textBaseline = "middle";
+    //ctx.fillStyle = "#800";
+    // ctx.fillRect(ox, oy, ox, oy);
+
+    const download_img = (el) => {
+        var image = canvas_save.toDataURL("image/jpg").replace('image/jpeg', 'image/octet-stream');
+        el.href = image;
+    };
 
     const teluguHandle = () => {
         if (words["word_len_test"] == false) {
@@ -131,6 +178,18 @@
         button.setAttribute('ID', 'again');
         button.setAttribute('onclick', "document.getElementById('go').click()")
     }
+    const share = () => {
+        var button = document.createElement("button");
+        button.innerHTML = "SHARE"
+        button.setAttribute('ID', 'share');
+        button.setAttribute('onclick', "screenshot()")
+        button.setAttribute('class', "btn btn-outline-info")
+        button.setAttribute('type', "submit")
+        button.setAttribute('data-toggle', "modal")
+        button.setAttribute('data-target', "#ModalShare")
+
+        document.getElementById("share_btn").appendChild(button);
+    }
     if (params["language"] === "English") {
         handleInput();
     } else if (params["language"] === "Telugu") {
@@ -160,6 +219,7 @@
                     jumpTiles(word_size, currentGuessCount);
                 }, 500);
                 again();
+                share();
             } else {
                 // Not won
                 currentGuessCount = currentGuessCount + 1;
