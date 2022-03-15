@@ -1,8 +1,31 @@
+COLOR_CLASS = {
+    0: "absent",
+    1: "correct",
+    2: "present",
+    3: "correct-base",
+    4: "present-base"
+};
 const chooseWord = (words_, ) => {
     // choose random item from words array
     let randomItem = Math.floor(Math.random() * (words_.length - 1)) + 1;
     // solutionWord = words_[randomItem]; 
     return words_[randomItem];
+};
+const flipTileTelugu = (row, col, state) => {
+    let tile = document.querySelector(
+        '#guess' + (row + 1) + 'Tile' + (col + 1)
+    );
+    tile.classList.add('flip-in');
+    setTimeout(() => {
+        tile.classList.add(state);
+    }, 250);
+    setTimeout(() => {
+        tile.classList.remove('flip-in');
+        tile.classList.add('flip-out');
+    }, 250);
+    setTimeout(() => {
+        tile.classList.remove('flip-out');
+    }, 1500);
 };
 const flipTile = (tileNum, state) => {
     let tile = document.querySelector(
@@ -20,7 +43,10 @@ const flipTile = (tileNum, state) => {
         tile.classList.remove('flip-out');
     }, 1500);
 };
+const checkTelugu = (position, n, guess_word) => {
 
+    return COLOR_CLASS[guess_word[n]["color_arr"][position]];
+};
 const checkLetter = (position, currentGuess, solutionWord) => {
     //console.log('checkLetter');
     let guessedLetter = currentGuess.dataset.letters.charAt(position);
@@ -38,6 +64,7 @@ const checkLetter = (position, currentGuess, solutionWord) => {
 
 };
 
+
 const showSolution = (solutionWord) => {
     alert('Better luck next time. The solution was: ' + solutionWord);
 };
@@ -52,11 +79,25 @@ const updateTiles = (tileNumber, letter) => {
 
     currentTile.classList.add('has-letter');
 };
+// Update tile markup for Telugu
+const updateTilesTelugu = (row, col, letter, color_idx) => {
+    let currentTile = document.querySelector(
+        '#guess' + (row + 1) + 'Tile' + (col + 1)
+    );
+    currentTile.innerText = letter;
+    currentTile.classList.add(COLOR_CLASS[color_idx]);
+};
+// Update tile markup for Telugu for flip
+const updateTilesTeluguForFlip = (row, col, letter, color_idx) => {
+    let currentTile = document.querySelector(
+        '#guess' + (row + 1) + 'Tile' + (col + 1)
+    );
+    currentTile.innerText = letter;
+    currentTile.classList.add('has-letter');
+};
 
 // Backspace -- Delete last tile markup
 const deleteFromTiles = (tileNumber, currentGuessCount) => {
-    // remove markup from last tile
-    //console.log('deleteFromTiles = ' + tileNumber);
     let currentTile = document.querySelector(
         '#guess' + currentGuessCount + 'Tile' + tileNumber
     );

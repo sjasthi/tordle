@@ -182,15 +182,40 @@ a:visited {
     border-color: #666
 }
 
+
+/* 1 = "Exact Match & Correct Position"*/
+
 .guess .correct {
     background-color: #008f00;
     border-color: #008f00
 }
 
+
+/* 3 = "Base Match & Correct Position*/
+
+.guess .correct-base {
+    background-color: #362eac;
+    border-color: #362eac;
+}
+
+
+/* 2 = "Exact Match & Wrong Position"*/
+
 .guess .present {
     background-color: #cbac25;
     border-color: #cbac25
 }
+
+
+/* 4 = "Base Match & Wrong Position"*/
+
+.guess .present-base {
+    background-color: #a73ca1;
+    border-color: #a73ca1;
+}
+
+
+/* 0 = No Match*/
 
 .guess .absent {
     background-color: #595959;
@@ -279,17 +304,18 @@ a:visited {
     color: #fff !important;
 }
 
-footer {
-    margin: auto;
-    position: absolute;
-    bottom: 5px;
-    /* width: 100%;
-    height: 2.5rem; */
-    padding: 1rem 2rem;
-}
-
 .close {
     color: #fff;
+}
+
+.center .content-section .form-group .requirements {
+    padding: 0 30px 0 50px;
+    color: #999;
+    max-height: 0;
+    transition: 0.28s;
+    /* overflow: hidden; */
+    color: red;
+    font-style: italic;
 }
 
 
