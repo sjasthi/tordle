@@ -26,7 +26,11 @@
             </form>
             {%else%}
             <button type="submit" id="again" onclick="document.getElementById('go').click()" class="btn btn-outline-info">PLAY AGAIN</button> {%if words.status=='SUCCESS' %}
-            <button type="submit" id="share" data-toggle="modal" data-target="#ModalShare" onclick="screenshot()" class="btn btn-outline-info">SHARE</button> {%endif%} {%endif%} {% else %}
+            <!-- <button type="submit" id="share" data-toggle="modal" data-target="#ModalShare" onclick="screenshot()" class="btn btn-outline-info">SHARE</button>  -->
+            <button type="submit" id="cripboard" onclick="cripboard()" class="btn btn-outline-info">Copy Image to Share</button>
+            <br> <br>
+            <h1 class="green-win">Yes! You Win.</h1>
+            {%endif%} {%endif%} {% else %}
             <fieldset class="form-group">
                 <input id="input" maxlength="{{params.length}}" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="handleInput" autocomplete="off" name="word">
             </fieldset>
@@ -70,6 +74,9 @@
     let word_size = params["length"]
     let total_rol = params["attempt"]
     var canvas_save = null;
+
+
+
     // Screenshot img
     const screenshot = () => {
         html2canvas(document.getElementById('image')).then(function(canvas) {
@@ -77,10 +84,17 @@
             canvas_save = canvas;
         });
     }
-
-    // download img
-    //  window.onload = init();
-    // var canvas = document.getElementById("canvas");
+    const cripboard = () => {
+            // screenshot();
+            html2canvas(document.getElementById('image'))
+                .then(canvas => canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({
+                    'image/png': blob
+                })])));
+            //let image = canvas_save.toDataURL("image/jpg").replace('image/jpeg', 'image/octet-stream');
+        }
+        // download img
+        //  window.onload = init();
+        // var canvas = document.getElementById("canvas");
 
     //   var ctx = canvas.getContext("2d");
     //  var ox = canvas.width;
@@ -178,6 +192,24 @@
         button.setAttribute('ID', 'again');
         button.setAttribute('onclick', "document.getElementById('go').click()")
     }
+    const cripboardBTN = () => {
+        var button = document.createElement("button");
+        button.innerHTML = "Copy Image to Share"
+        button.setAttribute('ID', 'cripboard');
+        button.setAttribute('onclick', "cripboard()")
+        button.setAttribute('class', "btn btn-outline-info")
+        button.setAttribute('type', "submit")
+            // button.setAttribute('data-toggle', "modal")
+            // button.setAttribute('data-target', "#ModalShare")
+
+        document.getElementById("share_btn").appendChild(button);
+        document.getElementById("share_btn").appendChild(document.createElement("br"));
+        document.getElementById("share_btn").appendChild(document.createElement("br"));
+        var h1 = document.createElement("h1")
+        h1.innerHTML = "Yes! You Win.";
+        h1.setAttribute("class", "green-win");
+        document.getElementById("share_btn").appendChild(h1);
+    }
     const share = () => {
         var button = document.createElement("button");
         button.innerHTML = "SHARE"
@@ -219,7 +251,8 @@
                     jumpTiles(word_size, currentGuessCount);
                 }, 500);
                 again();
-                share();
+                //share();
+                cripboardBTN();
             } else {
                 // Not won
                 currentGuessCount = currentGuessCount + 1;
