@@ -92,23 +92,6 @@
     }
 
     function cripboard() {
-        // screenshot();
-        /* let canvas_save = null;
-         html2canvas(document.getElementById('image')).then(function(canvas) {
-             // document.getElementById('canvas').appendChild(canvas);
-             // canvas_save = canvas;
-             try {
-                 canvas => canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({
-                         'image/png': blob
-                     })]))
-                     // alert('Image copied to clipboard!');
-                 console.log("image copied!")
-             } catch (err) {
-                 console.error(err.name, err.message);
-                 //  alert('There was an error while copying image to clipboard :/')
-             }
-
-         }); */
         html2canvas(document.getElementById('image')).then(
             function(canvas) {
                 document.getElementById('canvas').appendChild(canvas);
@@ -131,82 +114,6 @@
 
     }
 
-    // return a promise
-    function copyToClipboard(textToCopy) {
-        // navigator clipboard api needs a secure context (https)
-        if (navigator.clipboard && window.isSecureContext) {
-            // navigator clipboard api method'
-            return navigator.clipboard.writeText(textToCopy);
-        } else {
-            // text area method
-            let textArea = document.createElement("textarea");
-            textArea.value = textToCopy;
-            // make the textarea out of viewport
-            textArea.style.position = "fixed";
-            textArea.style.left = "-999999px";
-            textArea.style.top = "-999999px";
-            document.body.appendChild(textArea);
-            textArea.focus();
-            textArea.select();
-            return new Promise((res, rej) => {
-                // here the magic happens
-                document.execCommand('copy') ? res() : rej();
-                textArea.remove();
-            });
-        }
-    }
-
-    const cripboard_ = async() => {
-            const response = await fetch("/static/img/myImage.png");
-            const blob = await response.blob();
-            await navigator.clipboard.write([new ClipboardItem({
-                'image/png': blob
-            })]);
-            console.log("ciperj it..")
-                /*    copyToClipboard("I'm going to the clipboard python anywhere!")
-                       .then(() => console.log('text copied !'))
-                       .catch(() => console.log('error')); */
-                /*     navigator.clipboard.writeText('Hello Ping haha!')
-                        .then(() => {
-                            // Success!
-                        })
-                        .catch(err => {
-                            console.log('Something went wrong', err);
-                        });
-                    // screenshot();
-                html2canvas(document.getElementById('image'))
-                    .then(canvas => {
-                        var image = canvas.toDataURL("image/jpg").replace('image/jpeg', 'image/octet-stream');
-                        let inputEle = document.createElement('div')
-                        inputEle.setAttribute('readonly', true)
-                        inputEle.setAttribute('value', image)
-                        document.body.appendChild(inputEle)
-                            //Select
-                        inputEle.focus();
-                        inputEle.select();
-                        return new Promise((res, rej) => {
-                            // here the magic happens
-                            document.execCommand('copy') ? res() : rej();
-                            inputEle.remove();
-                        });
-                        //let isCopyed = document.execCommand('copy')
-                        // document.body.removeChild(inputEle)
-                        // return isCopyed
-                    });*/
-                //let image = canvas_save.toDataURL("image/jpg").replace('image/jpeg', 'image/octet-stream');
-        }
-        // download img
-        //  window.onload = init();
-        // var canvas = document.getElementById("canvas");
-
-    //   var ctx = canvas.getContext("2d");
-    //  var ox = canvas.width;
-    // var oy = canvas.height;
-    // ctx.font = "42px serif";
-    // ctx.textAlign = "center";
-    //ctx.textBaseline = "middle";
-    //ctx.fillStyle = "#800";
-    // ctx.fillRect(ox, oy, ox, oy);
 
     const download_img = (el) => {
         var image = canvas_save.toDataURL("image/jpg").replace('image/jpeg', 'image/octet-stream');
