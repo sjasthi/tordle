@@ -137,14 +137,14 @@
     }
 
     const cripboard = async() => {
-            /*  const response = await fetch("/static/img/myImage.png");
-              const blob = await response.blob();
-              await navigator.clipboard.write([new ClipboardItem({
-                  'image/png': blob
-              })]); */
-            copyToClipboard("I'm going to the clipboard python anywhere!")
-                .then(() => console.log('text copied !'))
-                .catch(() => console.log('error'));
+            const response = await fetch("/static/img/myImage.png");
+            const blob = await response.blob();
+            await navigator.clipboard.write([new ClipboardItem({
+                'image/png': blob
+            })]);
+            /*    copyToClipboard("I'm going to the clipboard python anywhere!")
+                   .then(() => console.log('text copied !'))
+                   .catch(() => console.log('error')); */
             /*     navigator.clipboard.writeText('Hello Ping haha!')
                     .then(() => {
                         // Success!
@@ -153,10 +153,25 @@
                         console.log('Something went wrong', err);
                     });
                 // screenshot();
-                  html2canvas(document.getElementById('image'))
-                       .then(canvas => canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({
-                           'image/png': blob
-                       })])));*/
+            html2canvas(document.getElementById('image'))
+                .then(canvas => {
+                    var image = canvas.toDataURL("image/jpg").replace('image/jpeg', 'image/octet-stream');
+                    let inputEle = document.createElement('div')
+                    inputEle.setAttribute('readonly', true)
+                    inputEle.setAttribute('value', image)
+                    document.body.appendChild(inputEle)
+                        //Select
+                    inputEle.focus();
+                    inputEle.select();
+                    return new Promise((res, rej) => {
+                        // here the magic happens
+                        document.execCommand('copy') ? res() : rej();
+                        inputEle.remove();
+                    });
+                    //let isCopyed = document.execCommand('copy')
+                    // document.body.removeChild(inputEle)
+                    // return isCopyed
+                });*/
             //let image = canvas_save.toDataURL("image/jpg").replace('image/jpeg', 'image/octet-stream');
         }
         // download img
