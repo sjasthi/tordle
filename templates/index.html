@@ -73,9 +73,15 @@
     console.log(params)
     let word_size = params["length"]
     let total_rol = params["attempt"]
-    var canvas_save = null;
+        // var canvas_save = null;
 
+    function getImageBlobFromUrl(url) {
+        const fetchedImageData = fetch(url).then(() => {
+            const blob = fetchedImageData.blob()
+            return blob
+        });
 
+    }
 
     // Screenshot img
     const screenshot = () => {
@@ -84,12 +90,37 @@
             canvas_save = canvas;
         });
     }
-    const cripboard = () => {
-            // screenshot();
-            html2canvas(document.getElementById('image'))
-                .then(canvas => canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({
+
+    function cripboard_() {
+        // screenshot();
+        let canvas_save = null;
+        html2canvas(document.getElementById('image')).then(function(canvas) {
+            // document.getElementById('canvas').appendChild(canvas);
+            // canvas_save = canvas;
+            try {
+                canvas => canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({
                     'image/png': blob
-                })])));
+                })]))
+                alert('Image copied to clipboard!');
+            } catch (err) {
+                console.error(err.name, err.message);
+                alert('There was an error while copying image to clipboard :/')
+            }
+
+        });
+
+    }
+    const cripboard = async() => {
+            const response = await fetch("/static/img/myImage.png");
+            const blob = await response.blob();
+            await navigator.clipboard.write([new ClipboardItem({
+                'image/png': blob
+            })]);
+            // screenshot();
+            /*   html2canvas(document.getElementById('image'))
+                   .then(canvas => canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({
+                       'image/png': blob
+                   })])));*/
             //let image = canvas_save.toDataURL("image/jpg").replace('image/jpeg', 'image/octet-stream');
         }
         // download img
