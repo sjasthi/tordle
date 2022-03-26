@@ -110,24 +110,53 @@
         });
 
     }
+
+    // return a promise
+    function copyToClipboard(textToCopy) {
+        // navigator clipboard api needs a secure context (https)
+        if (navigator.clipboard && window.isSecureContext) {
+            // navigator clipboard api method'
+            return navigator.clipboard.writeText(textToCopy);
+        } else {
+            // text area method
+            let textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            // make the textarea out of viewport
+            textArea.style.position = "fixed";
+            textArea.style.left = "-999999px";
+            textArea.style.top = "-999999px";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            return new Promise((res, rej) => {
+                // here the magic happens
+                document.execCommand('copy') ? res() : rej();
+                textArea.remove();
+            });
+        }
+    }
+
     const cripboard = async() => {
             /*  const response = await fetch("/static/img/myImage.png");
               const blob = await response.blob();
               await navigator.clipboard.write([new ClipboardItem({
                   'image/png': blob
               })]); */
-            navigator.clipboard.writeText('Hello Ping haha!')
-                .then(() => {
-                    // Success!
-                })
-                .catch(err => {
-                    console.log('Something went wrong', err);
-                });
-            // screenshot();
-            /*   html2canvas(document.getElementById('image'))
-                   .then(canvas => canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({
-                       'image/png': blob
-                   })])));*/
+            copyToClipboard("I'm going to the clipboard !")
+                .then(() => console.log('text copied !'))
+                .catch(() => console.log('error'));
+            /*     navigator.clipboard.writeText('Hello Ping haha!')
+                    .then(() => {
+                        // Success!
+                    })
+                    .catch(err => {
+                        console.log('Something went wrong', err);
+                    });
+                // screenshot();
+                  html2canvas(document.getElementById('image'))
+                       .then(canvas => canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({
+                           'image/png': blob
+                       })])));*/
             //let image = canvas_save.toDataURL("image/jpg").replace('image/jpeg', 'image/octet-stream');
         }
         // download img
