@@ -21,5 +21,10 @@ def home():
     return render_template("index.html", words=words, params=params)
 
 
+@app.route("/myinput", methods=["GET", "POST"])
+def my_input():
+    pass
+
+
 if __name__ == "__main__":
     app.run(debug=True)

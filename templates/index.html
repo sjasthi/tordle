@@ -94,7 +94,7 @@
     function cripboard() {
         html2canvas(document.getElementById('image')).then(
             function(canvas) {
-                document.getElementById('canvas').appendChild(canvas);
+                // document.getElementById('canvas').appendChild(canvas);
                 canvas.toBlob(
                     function(blob) {
                         navigator.clipboard.write(
