@@ -93,22 +93,41 @@
 
     function cripboard() {
         // screenshot();
-        let canvas_save = null;
-        html2canvas(document.getElementById('image')).then(function(canvas) {
-            // document.getElementById('canvas').appendChild(canvas);
-            // canvas_save = canvas;
-            try {
-                canvas => canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({
-                        'image/png': blob
-                    })]))
-                    // alert('Image copied to clipboard!');
-                console.log("image copied!")
-            } catch (err) {
-                console.error(err.name, err.message);
-                //  alert('There was an error while copying image to clipboard :/')
-            }
+        /* let canvas_save = null;
+         html2canvas(document.getElementById('image')).then(function(canvas) {
+             // document.getElementById('canvas').appendChild(canvas);
+             // canvas_save = canvas;
+             try {
+                 canvas => canvas.toBlob(blob => navigator.clipboard.write([new ClipboardItem({
+                         'image/png': blob
+                     })]))
+                     // alert('Image copied to clipboard!');
+                 console.log("image copied!")
+             } catch (err) {
+                 console.error(err.name, err.message);
+                 //  alert('There was an error while copying image to clipboard :/')
+             }
 
-        });
+         }); */
+        html2canvas(document.getElementById('image')).then(
+            function(canvas) {
+                document.getElementById('canvas').appendChild(canvas);
+                canvas.toBlob(
+                    function(blob) {
+                        navigator.clipboard.write(
+                            [
+                                new ClipboardItem(
+                                    Object.defineProperty({}, blob.type, {
+                                        value: blob,
+                                        enumerable: true
+                                    })
+                                )
+                            ]
+                        );
+                    }
+                );
+            }
+        );
 
     }
 
