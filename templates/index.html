@@ -91,7 +91,7 @@
         });
     }
 
-    function cripboard_() {
+    function cripboard() {
         // screenshot();
         let canvas_save = null;
         html2canvas(document.getElementById('image')).then(function(canvas) {
@@ -137,7 +137,7 @@
         }
     }
 
-    const cripboard = async() => {
+    const cripboard_ = async() => {
             const response = await fetch("/static/img/myImage.png");
             const blob = await response.blob();
             await navigator.clipboard.write([new ClipboardItem({
