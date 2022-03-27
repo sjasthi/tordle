@@ -1,4 +1,4 @@
-{% extends 'base.html' %} {% block content %}
+{% extends 'header.html' %} {% block body_content %}
 <div id="image" class="center">
     <section class="game">
         {%for i in range(1,(params.attempt + 1))%}
@@ -287,4 +287,4 @@
 </script>
 
 
-<br> {% endblock content %}
+<br> {% endblock body_content %}

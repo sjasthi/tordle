@@ -21,9 +21,34 @@ def home():
     return render_template("index.html", words=words, params=params)
 
 
-@app.route("/myinput", methods=["GET", "POST"])
+# admin@ics499.com -> ics499
+@app.route("/admin")
+def admin():
+    result = {
+        "language": "English",
+        "email": "",
+        "pwd": "",
+        "word_insert": "",
+        "PASS": False,
+    }
+    if request.form:
+        print("admin")
+        print(request.form)
+    # insert_word(request, result)
+    return render_template("admin.html", result=result)
+
+
+# admin@ics499.com -> ics499
+@app.route("/admin", methods=["POST"])
+def admin_input():
+    print("admin_input")
+    print(request.form)
+    return render_template("admin.html")
+
+
+@app.route("/my_word", methods=["GET", "POST"])
 def my_input():
-    pass
+    return "Hello my_word!"
 
 
 if __name__ == "__main__":

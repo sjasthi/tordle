@@ -19,6 +19,14 @@ class Telugu(db.Model):
         return f"Telugu(word:'{self.word}', length:{self.length}, list_str:'{self.list_str}')"
 
 
+class User(db.Model):
+    email = db.Column(db.String(500), primary_key=True)
+    pwd = db.Column(db.String(100), nullable=False)
+
+    def __repr__(self):
+        return f"User(Email:'{self.email}', Password:'{self.pwd}')"
+
+
 def getRandomWordByLength(length, language):
     if language == "English":
         results = English.query.filter_by(length=length).all()

@@ -149,3 +149,17 @@ def teluguFile2db(file, db, Telugu):
     #     tlg = Telugu(word=word, length=size, list_str=l_str)
     #     db.session.add(tlg)
     # db.session.commit()
+
+
+def insert_word(request, result):
+    result["language"] = request.form["language"]
+    result["email"] = request.form["admin_email"]
+    result["pwd"] = request.form["admin_pwd"]
+    result["word_insert"] = request.form["word_insert"]
+    result["PASS"] = True
+    print(result)
+    ss = User.query.all()
+    print(ss)
+    # user = User(email="pink@ics499.com", pwd="pink")
+    # db.session.add(user)
+    # db.session.commit()
