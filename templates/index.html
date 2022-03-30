@@ -12,17 +12,21 @@
     <br>
     <div class="content-section">
         {% if params and params.language == 'Telugu' %} {% if words.wordCount
-        <params.attempt and words.status=='PROCESS' %} <form action="{{ url_for('home')}}" method="post">
-            <fieldset class="form-group">
-                <input id="input" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="teluguHandle" autocomplete="off" name="word">
-            </fieldset>
-            <div class="form-group">
-                <button type="submit" id="submit" onclick="onClickTelugu()" class="btn btn-outline-info"> SUBMIT</button> {% if words.word_len_test==False %}
-                <div class="requirements">
-                    Must be a valid Word!
+        <params.attempt and words.status=='PROCESS' %} {%if params.url%} <form action="{{ url_for('custom_word_post', word_id=params.url) }}" method="post">
+            {%else%}
+            <form action="{{ url_for('home') }}" method="post">
+                {%endif%}
+
+                <fieldset class="form-group">
+                    <input id="input" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="teluguHandle" autocomplete="off" name="word">
+                </fieldset>
+                <div class="form-group">
+                    <button type="submit" id="submit" onclick="onClickTelugu()" class="btn btn-outline-info"> SUBMIT</button> {% if words.word_len_test==False %}
+                    <div class="requirements">
+                        Must be a valid Word!
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
-            </div>
             </form>
             {%else%}
             <button type="submit" id="again" onclick="document.getElementById('go').click()" class="btn btn-outline-info">PLAY AGAIN</button> {%if words.status=='SUCCESS' %}

@@ -295,7 +295,7 @@ a:visited {
     font-weight: 600;
     margin: 0;
     padding: 1rem 2rem;
-    text-transform: uppercase
+    /* text-transform: uppercase */
 }
 
 .form-control {

@@ -12,7 +12,7 @@
                 <span class="nav-item" href="">Language &#8195;</span>
                 <select name="language" class="btn-group ">
                                                         <option type="button" class="btn dropdown-toggle " data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" selected>
-                                            English
+                                            {{result.language}}
                                         </option>
                                                         <div class="dropdown-menu ">
                                                             <option class="dropdown-item " >English</a>
@@ -20,16 +20,19 @@
                                                         </div>
                                                     </select><br><br>
                 <label>Word Insert</label>
-                <input id="word_insert_input" class="form-control form-control-lg" type="text" autocomplete="off" name="word_insert">
+                <input id="word_insert_input" class="form-control form-control-lg" type="text" autocomplete="off" name="word_insert" value="{{result.word_insert}}">
                 <br><label>Admin Email</label>
-                <input id="admin_email_input" class="form-control form-control-lg" type="text" autocomplete="off" name="admin_email">
+                <input id="admin_email_input" class="form-control form-control-lg" type="text" autocomplete="off" name="admin_email" value="{{result.email}}">
                 <label>Admin Password</label>
-                <input id="admin_pwd_input" class="form-control form-control-lg" type="password" autocomplete="off" name="admin_pwd">
+                <input id="admin_pwd_input" class="form-control form-control-lg" type="password" autocomplete="off" name="admin_pwd" value="{{result.pwd}}">
             </fieldset>
             <div class="form-group">
-                <button type="submit" id="submit" onclick="onClickTelugu()" class="btn btn-outline-info">INSERT</button>
+                <button type="submit" id="submit" onclick="" class="btn btn-outline-info">INSERT</button>
             </div>
         </form>
+
+        <h5>{{result.message}}</h5>
+
     </div>
 </div>
 
