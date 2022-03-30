@@ -2,7 +2,10 @@
 <header class="site-header">
 
     <nav class="navbar navbar-expand-md navbar-dark bg-steel ">
+
         <div class="container">
+            &ensp; &ensp; &ensp; <a href="{{ url_for('index') }}">Home</a> &ensp; <a href="{{ url_for('admin') }}">Admin</a> &ensp;
+            <a href="{{ url_for('my_word') }}">My Word</a> &ensp; &ensp; <a href="">Longin</a>
             <h1 class="nav-center navbar-brand me-2 ">Tordle</h1>
             <div class="nav-right">
                 <span class="navbar-brand">{{params.language | title}}</span>

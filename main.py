@@ -69,8 +69,8 @@ def admin_input():
     return render_template("admin.html", result=result)
 
 
-@app.route("/my_word")
-def my_input():
+@app.route("/my_word", methods=["GET"])
+def my_word():
     result = {
         "language": "English",
         "email": "",
@@ -83,7 +83,7 @@ def my_input():
 
 
 @app.route("/my_word", methods=["POST"])
-def my_input_post():
+def my_word_post():
     result = generate_id(request, db)
     return render_template("my_word.html", result=result)
 
