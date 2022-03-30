@@ -295,7 +295,7 @@ a:visited {
     font-weight: 600;
     margin: 0;
     padding: 1rem 2rem;
-    text-transform: uppercase
+    /* text-transform: uppercase */
 }
 
 .form-control {
@@ -316,6 +316,10 @@ a:visited {
     /* overflow: hidden; */
     color: red;
     font-style: italic;
+}
+
+.green-win {
+    color: #008f00;
 }
 
 
