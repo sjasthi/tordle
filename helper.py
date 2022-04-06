@@ -209,7 +209,7 @@ def insert_word(request, db):
             db.session.commit()
             result["word_insert"] = ""
             result["PASS"] = True
-            result["message"] = "Input English Word Success!"
+            result["message"] = "Input Telugu Word Success!"
             return result
     result["message"] = "The word already exit!"
     return result
@@ -280,3 +280,85 @@ def get_word_by_id(word_id):
     if cw.language == "Telugu":
         words["solution"] = getTeluguLogicalChars(cw.word)
     return {"words": words, "params": params}
+
+
+result = {
+    "language": "English",
+    "length": "all",
+    "num_page": 15,
+    "word_list": None,
+}
+
+
+def get_system_list(request):
+    page = request.args.get("page", 1, type=int)
+    english_list = English.query.order_by(English.length).paginate(
+        page=page, per_page=15
+    )
+    result["word_list"] = english_list
+    result["language"] = "English"
+    result["length"] = "all"
+    result["num_page"] = 15
+    return result
+
+
+def get_system_list_search(request):
+    length = "all"
+    language = "English"
+    num_page = 15
+    page = 1
+    if request.args:
+        language = request.args.get("language")
+        num_page = int(request.args.get("num_page", 15, type=int))
+        page = request.args.get("page", 1, type=int)
+        length = request.args.get("length", "all", type=int)
+    result = get_system_list(request)
+    if request.form:
+        num_page = int(request.form["num_page"])
+        length = request.form["length"]
+        language = request.form["language"]
+    word_list = None
+    if length == "all":
+        if language == "English":
+            word_list = English.query.order_by(English.length).paginate(
+                page=page, per_page=num_page
+            )
+        elif language == "Telugu":
+            word_list = Telugu.query.order_by(Telugu.length).paginate(
+                page=page, per_page=num_page
+            )
+    else:
+        length = int(length)
+        if language == "English":
+            word_list = English.query.filter(English.length == length).paginate(
+                page=page, per_page=num_page
+            )
+        elif language == "Telugu":
+            word_list = Telugu.query.filter(Telugu.length == length).paginate(
+                page=page, per_page=num_page
+            )
+
+    result["word_list"] = word_list
+    result["language"] = language
+    result["length"] = length
+    result["num_page"] = num_page
+    return result
+
+
+def get_custom_list(request):
+    length = "all"
+    language = "all"
+    num_page = 15
+    page = 1
+    email = "all"
+    words = CustomWord.query.order_by(CustomWord.length).paginate(
+        page=page, per_page=num_page
+    )
+    result = {
+        "language": language,
+        "length": length,
+        "num_page": num_page,
+        "word_list": words,
+        "email": email,
+    }
+    return result
