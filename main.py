@@ -43,7 +43,7 @@ def home():
 
 
 # admin@ics499.com -> ics499
-@app.route("/admin")
+@app.route("/admin/input_word")
 def admin():
     result = {
         "language": "English",
@@ -53,24 +53,30 @@ def admin():
         "PASS": False,
         "message": "",
     }
-    if request.form:
-        print("admin")
-        print(request.form)
-    # insert_word(request, result)
-    return render_template("admin.html", result=result)
+    params = {
+        "length": 5,
+        "attempt": 6,
+        "language": result["language"],
+        "url": None,
+    }
+    return render_template("admin.html", params=params, result=result)
 
 
 # admin@ics499.com -> ics499
-@app.route("/admin", methods=["POST"])
+@app.route("/admin/input_word", methods=["POST"])
 def admin_input():
-    print("admin_input")
-    print(request.form)
     result = insert_word(request, db)
-    return render_template("admin.html", result=result)
+    params = {
+        "length": len(result["word_insert"]) if not result["word_insert"] else 5,
+        "attempt": 6,
+        "language": "English",
+        "url": None,
+    }
+    return render_template("admin.html", params=params, result=result)
 
 
-@app.route("/my_word")
-def my_input():
+@app.route("/my_word", methods=["GET"])
+def my_word():
     result = {
         "language": "English",
         "email": "",
@@ -79,13 +85,25 @@ def my_input():
         "PASS": False,
         "message": "",
     }
-    return render_template("my_word.html", result=result)
+    params = {
+        "length": 5,
+        "attempt": 6,
+        "language": result["language"],
+        "url": None,
+    }
+    return render_template("my_word.html", params=params, result=result)
 
 
 @app.route("/my_word", methods=["POST"])
-def my_input_post():
+def my_word_post():
     result = generate_id(request, db)
-    return render_template("my_word.html", result=result)
+    params = {
+        "length": len(result["word_insert"]) if not result["word_insert"] else 5,
+        "attempt": 6,
+        "language": "English",
+        "url": None,
+    }
+    return render_template("my_word.html", params=params, result=result)
 
 
 @app.route("/my_word/<word_id>")
@@ -104,6 +122,18 @@ def custom_word_post(word_id):
             words["word_input"] = request.form["word"]
             getResult(words)
     return render_template("index.html", words=words, params=params)
+
+
+@app.route("/admin/custom_list", methods=["GET", "POST"])
+def custom_list():
+    result = get_custom_list(request)
+    return render_template("custom_list.html", result=result, params=params)
+
+
+@app.route("/admin/system_list", methods=["GET", "POST"])
+def system_list_search():
+    result = get_system_list_search(request)
+    return render_template("system_list.html", result=result, params=params)
 
 
 if __name__ == "__main__":

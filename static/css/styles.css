@@ -323,4 +323,47 @@ a:visited {
 }
 
 
+/* Navbar container */
+
+
+/* ============ desktop view ============ */
+
+@media all and (min-width: 992px) {
+    .navbar .nav-item .dropdown-menu {
+        display: none;
+    }
+    .navbar .nav-item:hover .nav-link {}
+    .navbar .nav-item:hover .dropdown-menu {
+        display: block;
+    }
+    .navbar .nav-item .dropdown-menu {
+        margin-top: 0;
+    }
+}
+
+
+/* Dropdown button */
+
+.dropdown .dropbtn {
+    font-size: 16px;
+    border: none;
+    outline: none;
+    color: #362eac;
+    padding: 14px 16px;
+    background-color: inherit;
+    font-family: inherit;
+    /* Important for vertical align on mobile phones */
+    margin: 0;
+    /* Important for vertical align on mobile phones */
+}
+
+.table {
+    /* top: 30px; */
+    /* margin-left: 300px;
+    margin-right: 300px; */
+    max-width: 70.375rem;
+    padding: 0 1.5rem
+}
+
+
 /*# sourceMappingURL=style.css.map */
