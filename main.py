@@ -136,5 +136,21 @@ def system_list_search():
     return render_template("system_list.html", result=result, params=params)
 
 
+@app.route("/admin/system_list/<string:word>/edit", methods=["POST"])
+def edit_system_word(word):
+    print(word)
+    return "edit system word"
+    # result = get_edit_system_word(request, word)
+    # return render_template("system_list.html", result=result, params=params)
+
+
+@app.route("/admin/system_list/<string:word>/delete", methods=["POST"])
+def delete_system_word(word):
+    print(word)
+    return " delete system word" + word
+    # result = get_edit_system_word(request, word)
+    # return render_template("system_list.html", result=result, params=params)
+
+
 if __name__ == "__main__":
     app.run(debug=True)

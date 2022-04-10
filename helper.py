@@ -235,7 +235,13 @@ def generate_id(request, db):
                 length = len(result["word_insert"].lower())
                 word = result["word_insert"].lower()
             else:
-                result["message"] = "The word olready exit in your list"
+                result["message"] = (
+                    "The word already input by :\n\t\t"
+                    + temp.email
+                    + "\nThe exit link is: \n\t\t"
+                    + "https://tordle.pythonanywhere.com/my_word/"
+                    + str(temp.id)
+                )
                 return result
         elif result["language"] == "Telugu":
             temp = CustomWord.query.filter_by(word=result["word_insert"]).first()
@@ -244,7 +250,13 @@ def generate_id(request, db):
                 length = len(arr)
                 word = result["word_insert"]
             else:
-                result["message"] = "The word olready exit in your list"
+                result["message"] = (
+                    "The word already input by :\n\t\t"
+                    + temp.email
+                    + "\nThe exit link is: \n\t\t"
+                    + "https://tordle.pythonanywhere.com/my_word/"
+                    + str(temp.id)
+                )
                 return result
         cw = CustomWord(
             word=word,
@@ -298,7 +310,6 @@ def get_system_list(request):
     result["word_list"] = english_list
     result["language"] = "English"
     result["length"] = "all"
-    result["num_page"] = 15
     return result
 
 
@@ -314,7 +325,7 @@ def get_system_list_search(request):
         length = request.args.get("length", "all", type=int)
     result = get_system_list(request)
     if request.form:
-        num_page = int(request.form["num_page"])
+        num_page = 15
         length = request.form["length"]
         language = request.form["language"]
     word_list = None
@@ -341,7 +352,6 @@ def get_system_list_search(request):
     result["word_list"] = word_list
     result["language"] = language
     result["length"] = length
-    result["num_page"] = num_page
     return result
 
 
@@ -357,8 +367,11 @@ def get_custom_list(request):
     result = {
         "language": language,
         "length": length,
-        "num_page": num_page,
         "word_list": words,
         "email": email,
     }
     return result
+
+
+def get_edit_system_word(request, word):
+    pass

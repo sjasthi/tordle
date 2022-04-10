@@ -8,8 +8,11 @@
             {{result.language}} 
         </option>
                         <div class="dropdown-menu ">
-                            <option class="dropdown-item " >English</a>
+                          {%if result.language == 'English'%}
                             <option class="dropdown-item " >Telugu</a>
+                            {%else%}
+                            <option class="dropdown-item " >English</a>
+                            {%endif%}
                         </div>
                     </select> &#8195; &#8195;<span>Length </span>
         <select name="length" class="btn-group ">
@@ -21,18 +24,10 @@
                                             <option class="dropdown-item " value="{{i}}">{{i}}</option> {%endfor%}
                                         </div>
                                     </select> &#8195; &#8195;
-        </select> &#8195; &#8195;<span>Number word of page </span>
-        <select name="num_page" class="btn-group ">
-                                                                <option type="button" class="btn dropdown-toggle " data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" selected>
-                                                                    {{result.num_page}}
-                                                                </option>
-                                                                <div class="dropdown-menu ">
-                                                                    {%for i in range(1,11)%}
-                                                                    <option class="dropdown-item " value="{{i*5}}">{{i*5}}</option> {%endfor%}
-                                                                </div>
-                                                            </select> &#8195; &#8195;
-        <button type="submit" id="search" class="btn btn-outline-info" ">Search</button>
-    
+        </select> &#8195;<label>Search by Key Word: </label> <input name="key_word" value="">
+        <button type="submit" id="search" class="btn btn-outline-info" ">Search</button>&#8195; &#8195; &#8195; &#8195; 
+        <a  href="{{ url_for( 'admin') }} " id="add_word " class="btn btn-outline-info " ">Add New Word</a>
+
     </form>
 </div>
 <div class="center ">
@@ -45,30 +40,74 @@
             </tr>
         </thead>
         <tbody>
-            {%if result.word_list.items%}
-            {% for word in result.word_list.items %}
+            {%if result.word_list.items%} {% for word in result.word_list.items %}
             <tr>
                 <td>{{word.word}}</td>
                 <td>{{word.length}}</td>
-                <td><a href="# ">Edit</a>&#8195;<a href="# ">Delete</a> </td>
+                <td>
+                    <div>
+                        <!-- <a class="btn btn-secondary btn-sm mt-1 mb-1 " href="{{ url_for( 'edit_system_word', word=word.word) }} ">Edit</a>
+                        <button type="button " class="btn btn-danger btn-sm m-1 " data-toggle="modal " onclick="console.log( 'clike delete') " data-target="#deleteWordModal ">Delete</button> -->
+                        <button type="button" data-toggle="modal" data-target="#editWordModal{{word.word}}" class="edit" data-toggle="modal"><i class="material-icons" title="Edit">&#xE254;</i></button>
+                        <button type="button" data-toggle="modal" data-target="#deleteWordModal{{word.word}}" class="delete" data-toggle="modal"><i class="material-icons"  title="Delete">&#xE872;</i></button>
+
+                    </div>
+                    <!-- Delete Modal HTML -->
+                    <div id="deleteWordModal{{word.word}}" class="modal fade">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="POST" action="{{ url_for('delete_system_word', word=word.word) }}">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Delete Word: " {{word.word}} "</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to delete " {{word.word}} "</p>
+                                        <p class="text-warning"><small>This action cannot be undone.</small></p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                                        <input type="submit" class="btn btn-danger" value="Delete">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Edit Modal HTML -->
+                    <div id="editWordModal{{word.word}}" class="modal fade">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="POST" action="{{ url_for('edit_system_word', word=word.word) }}">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Edit Word</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label>Word</label>
+                                            <input type="text" class="form-control" value="{{word.word}}">
+                                        </div>
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                                        <input type="submit" class="btn btn-info" value="Save">
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </td>
             </tr>
-            {%endfor%}
-            {%endif%}
+            {%endfor%} {%endif%}
         </tbody>
     </table>
+
+    <!-- {%if result.word_list.items%} {% for word in result.word_list.items %} {%endfor%} {%endif%} -->
     <div class="container ">
-    {% for page_num in result.word_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-      {% if page_num %}
-        {% if result.word_list.page == page_num %}
-          <a class="btn btn-outline-info mb-4 " href="{{ url_for( 'system_list_search', length=result.length, num_page=result.num_page, language=result.language, page=page_num) }} ">{{ page_num }}</a>
-        {% else %}
-          <a class="btn btn-outline-info mb-4 " href="{{ url_for( 'system_list_search', length=result.length, num_page=result.num_page, language=result.language, page=page_num) }} ">{{ page_num }}</a>
-          
-        {% endif %}
-      {% else %}
-        ...
-      {% endif %}
-    {% endfor %}
+        {% for page_num in result.word_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %} {% if page_num %} {% if result.word_list.page == page_num %}
+        <a class="btn btn-outline-info mb-4 " href="{{ url_for( 'system_list_search', length=result.length,  language=result.language, page=page_num) }} ">{{ page_num }}</a> {% else %}
+        <a class="btn btn-outline-info mb-4 " href="{{ url_for( 'system_list_search', length=result.length,  language=result.language, page=page_num) }} ">{{ page_num }}</a> {% endif %} {% else %} ... {% endif %} {% endfor %}
     </div>
-</div>
-{% endblock body_content %}
+</div> {% endblock body_content %}

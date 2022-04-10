@@ -21,9 +21,9 @@
                                                     </select><br><br>
                 <label>Word Insert</label>
                 <input id="word_insert_input" class="form-control form-control-lg" type="text" autocomplete="off" name="word" value="{{result.word_insert}}">
-                <br><label>Admin Email</label>
+                <br><label>Your Email</label>
                 <input id="admin_email_input" class="form-control form-control-lg" type="text" autocomplete="off" name="email" value="{{result.email}}">
-                <label>Admin Password</label>
+                <label>Your Password</label>
                 <input id="admin_pwd_input" maxlength="60" minlength="2" class="form-control form-control-lg" type="password" autocomplete="off" name="pwd" value="{{result.pwd}}">
             </fieldset>
             <div class="form-group">
@@ -31,7 +31,7 @@
             </div>
         </form>
 
-        <h5>{{result.message}}</h5>
+        <h5 style="white-space: pre-line">{{result.message}}</h5>
 
     </div>
 </div>

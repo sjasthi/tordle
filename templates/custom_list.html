@@ -21,19 +21,10 @@
                                             <option class="dropdown-item " value="{{i}}">{{i}}</option> {%endfor%}
                                         </div>
                                     </select> &#8195; &#8195;
-        </select> &#8195; &#8195;<span>Number word of page </span>
-        <select name="num_page" class="btn-group ">
-                                                                <option type="button" class="btn dropdown-toggle " data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" selected>
-                                                                    {{result.num_page}}
-                                                                </option>
-                                                                <div class="dropdown-menu ">
-                                                                    {%for i in range(1,11)%}
-                                                                    <option class="dropdown-item " value="{{i*5}}">{{i*5}}</option> {%endfor%}
-                                                                </div>
-                                                            </select> &#8195; &#8195;
-        <label>Email: </label> <input name="email" value="all">
+        </select> &#8195; &#8195;
+        <label>Email: </label> <input name="email" value="">
         <button type="submit" id="search" class="btn btn-outline-info" ">Search</button>
-    
+        &#8195; &#8195; &#8195;&#8195;<a  href="# " id="add_word " class="btn btn-outline-info " ">Add New User</a>
     </form>
 </div>
 <div class="center ">
@@ -49,8 +40,7 @@
             </tr>
         </thead>
         <tbody>
-            {%if result.word_list.items%}
-            {% for word in result.word_list.items %}
+            {%if result.word_list.items%} {% for word in result.word_list.items %}
             <tr>
                 <th scope="row ">{{word.id}}</th>
                 <td>{{word.word}}</td>
@@ -60,23 +50,13 @@
                 <td><a href="# ">Edit</a>&#8195;<a href="# ">Delete</a> </td>
 
             </tr>
-           {%endfor%}
-           {%endif%}
+            {%endfor%} {%endif%}
         </tbody>
     </table>
     <div class="container ">
-        {% for page_num in result.word_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
-          {% if page_num %}
-            {% if result.word_list.page == page_num %}
-              <a class="btn btn-outline-info mb-4 " href="{{ url_for( 'custom_list', length=result.length, num_page=result.num_page, language=result.language, page=page_num) }} ">{{ page_num }}</a>
-            {% else %}
-              <a class="btn btn-outline-info mb-4 " href="{{ url_for( 'custom_list', length=result.length, num_page=result.num_page, language=result.language, page=page_num) }} ">{{ page_num }}</a>
-              
-            {% endif %}
-          {% else %}
-            ...
-          {% endif %}
-        {% endfor %}
-        </div>
+        {% for page_num in result.word_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %} {% if page_num %} {% if result.word_list.page == page_num %}
+        <a class="btn btn-outline-info mb-4 " href="{{ url_for( 'custom_list', length=result.length, language=result.language, page=page_num) }} ">{{ page_num }}</a> {% else %}
+        <a class="btn btn-outline-info mb-4 " href="{{ url_for( 'custom_list', length=result.length, language=result.language, page=page_num) }} ">{{ page_num }}</a> {% endif %} {% else %} ... {% endif %} {% endfor %}
+    </div>
 </div>
 {% endblock body_content %}
