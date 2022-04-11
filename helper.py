@@ -4,6 +4,7 @@ import requests
 import json
 from models import *
 from telugu import getTeluguLogicalChars
+from flask import flash
 
 
 params = {"length": 5, "attempt": 6, "language": "English", "url": "url_for('home')"}
@@ -308,8 +309,15 @@ def get_system_list(request):
         page=page, per_page=15
     )
     result["word_list"] = english_list
-    result["language"] = "English"
-    result["length"] = "all"
+    result["num_page"] = 15
+    if request.form:
+        result["language"] = request.form["language"]
+        result["length"] = request.form["length"]
+        result["key_word"] = request.form["key_word"]
+    else:
+        result["language"] = "English"
+        result["length"] = "all"
+        result["key_word"] = ""
     return result
 
 
@@ -318,41 +326,101 @@ def get_system_list_search(request):
     language = "English"
     num_page = 15
     page = 1
+    key_word = ""
     if request.args:
-        language = request.args.get("language")
+        language = request.args.get("language", "English", type=str)
         num_page = int(request.args.get("num_page", 15, type=int))
         page = request.args.get("page", 1, type=int)
         length = request.args.get("length", "all", type=int)
+        key_word = request.args.get("key_word", "", type=str)
     result = get_system_list(request)
     if request.form:
         num_page = 15
         length = request.form["length"]
         language = request.form["language"]
+        key_word = request.form["key_word"]
     word_list = None
     if length == "all":
         if language == "English":
-            word_list = English.query.order_by(English.length).paginate(
-                page=page, per_page=num_page
+            word_list = (
+                English.query.filter(English.word.like(f"%{key_word}%"))
+                .order_by(English.length)
+                .paginate(page=page, per_page=num_page)
             )
         elif language == "Telugu":
-            word_list = Telugu.query.order_by(Telugu.length).paginate(
-                page=page, per_page=num_page
+            word_list = (
+                Telugu.query.filter(Telugu.word.like(f"%{key_word}%"))
+                .order_by(Telugu.length)
+                .paginate(page=page, per_page=num_page)
             )
     else:
         length = int(length)
         if language == "English":
-            word_list = English.query.filter(English.length == length).paginate(
-                page=page, per_page=num_page
+            word_list = (
+                English.query.filter(English.word.like(f"%{key_word}%"))
+                .filter(English.length == length)
+                .paginate(page=page, per_page=num_page)
             )
         elif language == "Telugu":
-            word_list = Telugu.query.filter(Telugu.length == length).paginate(
-                page=page, per_page=num_page
+            word_list = (
+                Telugu.query.filter(Telugu.word.like(f"%{key_word}%"))
+                .filter(Telugu.length == length)
+                .paginate(page=page, per_page=num_page)
             )
 
     result["word_list"] = word_list
     result["language"] = language
     result["length"] = length
+    result["key_word"] = key_word
     return result
+
+
+def handle_delete_word(word, request):
+    if result["language"] == "English":
+        english = English.query.get_or_404(word)
+        db.session.delete(english)
+        db.session.commit()
+        flash("Your word has been deleted from system!", "success")
+    elif result["language"] == "Telugu":
+        telugu = Telugu.query.get_or_404(word)
+        db.session.delete(telugu)
+        db.session.commit()
+        flash("Your post has been deleted from system!", "success")
+
+
+def handle_edit_word(request):
+    if (
+        request.form["new_word"] != ""
+        and request.form["new_word"] != request.form["old_word"]
+    ):
+        if request.form["language"] == "English":
+            new_english = English.query.filter_by(word=request.form["new_word"]).first()
+            if not new_english:
+                old_english = English.query.filter_by(
+                    word=request.form["old_word"]
+                ).first()
+                old_english.word = request.form["new_word"]
+                old_english.length = len(request.form["new_word"])
+                db.session.commit()
+                flash("Your word has been Updated for system!", "success")
+            else:
+                flash("You cannot update dupicate words for system!", "danger")
+
+        elif request.form["language"] == "Telugu":
+            new_telugu = Telugu.query.filter_by(word=request.form["new_word"]).first()
+            if not new_telugu:
+                old_telugu = Telugu.query.filter_by(
+                    word=request.form["old_word"]
+                ).first()
+                old_telugu.word = request.form["new_word"]
+                arr = getTeluguLogicalChars(request.form["new_word"])
+                old_telugu.length = len(arr)
+                db.session.commit()
+                flash("Your word has been Updated for system!", "success")
+            else:
+                flash("You cannot update dupicate words for system!", "danger")
+    else:
+        flash("You have done nothing for system!", "danger")
 
 
 def get_custom_list(request):
@@ -360,7 +428,8 @@ def get_custom_list(request):
     language = "all"
     num_page = 15
     page = 1
-    email = "all"
+    email = ""
+    key_word = ""
     words = CustomWord.query.order_by(CustomWord.length).paginate(
         page=page, per_page=num_page
     )
@@ -369,9 +438,55 @@ def get_custom_list(request):
         "length": length,
         "word_list": words,
         "email": email,
+        "key_word": key_word,
     }
+    if request.args:
+        language = request.args.get("language", "English", type=str)
+        num_page = int(request.args.get("num_page", 15, type=int))
+        page = request.args.get("page", 1, type=int)
+        length = request.args.get("length", "all", type=int)
+        key_word = request.args.get("key_word", "", type=str)
+    if request.form:
+        num_page = 15
+        length = request.form["length"]
+        language = request.form["language"]
+        key_word = request.form["key_word"]
+    word_list = None
+    if length == "all":
+        if language == "English":
+            word_list = (
+                English.query.filter(English.word.like(f"%{key_word}%"))
+                .order_by(English.length)
+                .paginate(page=page, per_page=num_page)
+            )
+        elif language == "Telugu":
+            word_list = (
+                Telugu.query.filter(Telugu.word.like(f"%{key_word}%"))
+                .order_by(Telugu.length)
+                .paginate(page=page, per_page=num_page)
+            )
+    else:
+        length = int(length)
+        if language == "English":
+            word_list = (
+                English.query.filter(English.word.like(f"%{key_word}%"))
+                .filter(English.length == length)
+                .paginate(page=page, per_page=num_page)
+            )
+        elif language == "Telugu":
+            word_list = (
+                Telugu.query.filter(Telugu.word.like(f"%{key_word}%"))
+                .filter(Telugu.length == length)
+                .paginate(page=page, per_page=num_page)
+            )
+
+    result["word_list"] = word_list
+    result["language"] = language
+    result["length"] = length
+    result["key_word"] = key_word
+    result["email"] = email
     return result
 
 
-def get_edit_system_word(request, word):
+def handle_delete_custom_word(request, word):
     pass

@@ -116,7 +116,6 @@ def custom_word(word_id):
 
 @app.route("/my_word/<word_id>", methods=["POST"])
 def custom_word_post(word_id):
-    print(words, params)
     if request.form:
         if params["language"] == "Telugu":
             words["word_input"] = request.form["word"]
@@ -130,24 +129,28 @@ def custom_list():
     return render_template("custom_list.html", result=result, params=params)
 
 
+@app.route("/admin/system_list/<string:word>/delete", methods=["POST"])
+def delete_custom_word(word):
+    handle_delete_custom_word(word, request)
+    return redirect(url_for("system_list_search"))
+
+
 @app.route("/admin/system_list", methods=["GET", "POST"])
 def system_list_search():
     result = get_system_list_search(request)
     return render_template("system_list.html", result=result, params=params)
 
 
-@app.route("/admin/system_list/<string:word>/edit", methods=["POST"])
-def edit_system_word(word):
-    print(word)
-    return "edit system word"
-    # result = get_edit_system_word(request, word)
-    # return render_template("system_list.html", result=result, params=params)
-
-
 @app.route("/admin/system_list/<string:word>/delete", methods=["POST"])
 def delete_system_word(word):
-    print(word)
-    return " delete system word" + word
+    handle_delete_word(word, request)
+    return redirect(url_for("system_list_search"))
+
+
+@app.route("/admin/system_list/edit", methods=["POST"])
+def edit_system_word():
+    handle_edit_word(request)
+    return redirect(url_for("system_list_search"))
     # result = get_edit_system_word(request, word)
     # return render_template("system_list.html", result=result, params=params)
 
