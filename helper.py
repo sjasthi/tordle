@@ -3,7 +3,7 @@
 import requests
 import json
 from models import *
-from telugu import getTeluguLogicalChars
+from telugu import getTeluguLogicalChars, isTeluguWord, isEnglish
 from flask import flash
 
 
@@ -446,41 +446,51 @@ def get_custom_list(request):
         page = request.args.get("page", 1, type=int)
         length = request.args.get("length", "all", type=int)
         key_word = request.args.get("key_word", "", type=str)
+        email = request.args.get("email", "", type=str)
     if request.form:
         num_page = 15
         length = request.form["length"]
         language = request.form["language"]
         key_word = request.form["key_word"]
-    word_list = None
+        email = request.form["email"]
+
     if length == "all":
-        if language == "English":
-            word_list = (
-                English.query.filter(English.word.like(f"%{key_word}%"))
-                .order_by(English.length)
+        if language == "all":
+            words = (
+                CustomWord.query.filter(CustomWord.word.like(f"%{key_word}%"))
+                .filter(CustomWord.email.like(f"%{email}%"))
+                .order_by(CustomWord.length)
                 .paginate(page=page, per_page=num_page)
             )
-        elif language == "Telugu":
-            word_list = (
-                Telugu.query.filter(Telugu.word.like(f"%{key_word}%"))
-                .order_by(Telugu.length)
+        else:
+            words = (
+                CustomWord.query.filter_by(language=language)
+                .filter(CustomWord.email.like(f"%{email}%"))
+                .filter(CustomWord.word.like(f"%{key_word}%"))
+                .order_by(CustomWord.id)
                 .paginate(page=page, per_page=num_page)
             )
     else:
         length = int(length)
-        if language == "English":
-            word_list = (
-                English.query.filter(English.word.like(f"%{key_word}%"))
-                .filter(English.length == length)
+        if language == "all":
+            words = (
+                CustomWord.query.filter_by(length=length)
+                .filter(CustomWord.email.like(f"%{email}%"))
+                .filter(CustomWord.word.like(f"%{key_word}%"))
+                .order_by(CustomWord.id)
                 .paginate(page=page, per_page=num_page)
             )
-        elif language == "Telugu":
-            word_list = (
-                Telugu.query.filter(Telugu.word.like(f"%{key_word}%"))
-                .filter(Telugu.length == length)
+        else:
+            words = (
+                CustomWord.query.filter_by(length=length)
+                .filter_by(language=language)
+                .filter(CustomWord.email.like(f"%{email}%"))
+                .filter(CustomWord.word.like(f"%{key_word}%"))
+                .order_by(CustomWord.id)
                 .paginate(page=page, per_page=num_page)
             )
 
-    result["word_list"] = word_list
+    result["word_list"] = words
     result["language"] = language
     result["length"] = length
     result["key_word"] = key_word
@@ -488,5 +498,27 @@ def get_custom_list(request):
     return result
 
 
-def handle_delete_custom_word(request, word):
-    pass
+def handle_delete_custom_word(request, word_id):
+    custom_word = CustomWord.query.get_or_404(word_id)
+    db.session.delete(custom_word)
+    db.session.commit()
+    flash("Your word has been deleted from List!", "success")
+
+
+def handle_edit_custom_word(request):
+    print(request.form)
+    id = int(request.form["word_id"])
+    word = CustomWord.query.get_or_404(id)
+    if word.word != (request.form["word"]).strip():
+        word.word = (request.form["word"]).strip()
+        if isEnglish((request.form["word"]).strip()):
+            word.length = len((request.form["word"]).strip())
+        elif isTeluguWord((request.form["word"]).strip()):
+            arr = getTeluguLogicalChars((request.form["word"]).strip())
+            word.length = len(arr)
+    if word.language != request.form["language"]:
+        word.language = request.form["language"]
+    if word.email != (request.form["email"]).strip():
+        word.email = (request.form["email"]).strip()
+    db.session.commit()
+    flash("Your word has been Updated from List!", "success")

@@ -1,6 +1,7 @@
 {% extends 'header.html' %} {% block body_content %}
 <div class="container">
-    <span style="font-size: 30px;">Custome Word List &#8195; &#8195;</span>
+    <span style="font-size: 30px;">Custome Word List &#8195; &#8195;&#8195;&#8195;&#8195;</span>
+    <a href="#" id="add_word" class="btn btn-outline-info">Add New User</a> <br> <br>
     <form class="form-select form-select-lg mb-3" method="POST" action="{{ url_for('custom_list') }}">
         <label>Key Word: </label> <input name="key_word" value="{{result.key_word}}"> &#8195;<label>Email: </label> <input name="email" value="{{result.email}}"> &#8195;
         <span>Language </span>
@@ -12,7 +13,7 @@
                             <option class="dropdown-item" >English</a>
                             <option class="dropdown-item" >Telugu</a>
                         </div>
-                    </select> &#8195; &#8195;<span>Length </span>
+                    </select> &#8195;<span>Length </span>
         <select name="length" class="btn-group">
                                         <option type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" selected>
                                             {{result.length}}
@@ -24,7 +25,7 @@
                                     </select> &#8195;
         </select> &#8195;
 
-        <button type="submit" id="search" class="btn btn-outline-info">Search</button> &#8195; &#8195; &#8195;&#8195;&#8195;&#8195;<a href="#" id="add_word" class="btn btn-outline-info">Add New User</a>
+        <button type="submit" id="search" class="btn btn-outline-info">Search</button> &#8195; <a href="{{ url_for('custom_list')}}" id="show_all" class="btn btn-outline-info">Show All</a>
     </form>
 </div>
 <div class="center">
@@ -47,72 +48,95 @@
                 <td>{{word.length}}</td>
                 <td>{{word.language}}</td>
                 <td>{{word.email}}</td>
-                <div>
-                    <button type="button" data-toggle="modal" data-target='#editWordModal{{word.id}}' class="edit" data-toggle="modal"><i class="material-icons" title="Edit">&#xE254;</i></button>
-                    <button type="button" onclick="console.log( '{{word.word}}')" data-toggle="modal" data-target='#deleteWordModal{{word.id}}' class="delete" data-toggle="modal"><i class="material-icons"  title="Delete ">&#xE872;</i></button>
-                </div>
-                <!-- Delete Modal HTML -->
-                <div class="modal fade" id='deleteWordModal{{word.id}}'>
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <form method="POST" action="{{ url_for( 'delete_custom_word', word=word.word) }}">
-                                <div class="modal-header ">
-                                    <h4 class="modal-title ">Delete Word: {{word.word}} </h4>
-                                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Are you sure you want to delete {{word.word}} which created by {{word.email}}</p>
-                                    <p class="text-warning"><small>This action cannot be undone.</small></p>
-                                </div>
-                                <input type="hidden" name="language" value="{{result.language}}">
-                                <input type="hidden" name="length" value="{{result.length}}">
-                                <input type="hidden" name="email" value="{{result.email}}">
-                                <div class="modal-footer">
-                                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-                                    <input type="submit" class="btn btn-danger" value="Delete">
-                                </div>
-                            </form>
+                <td>
+                    <div>
+                        <button type="button" data-toggle="modal" data-target='#editWordModal{{word.id}}' class="edit" data-toggle="modal"><i class="material-icons" title="Edit">&#xE254;</i></button>
+                        <button type="button" onclick="console.log( '{{word.word}}')" data-toggle="modal" data-target='#deleteWordModal{{word.id}}' class="delete" data-toggle="modal"><i class="material-icons"  title="Delete ">&#xE872;</i></button>
+                    </div>
+                    <!-- Delete Modal HTML -->
+                    <div class="modal fade" id='deleteWordModal{{word.id}}'>
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="POST" action="{{ url_for( 'delete_custom_word', word_id=word.id) }}">
+                                    <div class="modal-header ">
+                                        <h4 class="modal-title ">Delete Word: {{word.word}} </h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Are you sure you want to delete word: {{word.word}}, ID: {{word.id}} which created by {{word.email}}</p>
+                                        <p class="text-warning"><small>This action cannot be undone.</small></p>
+                                    </div>
+                                    <input type="hidden" name="word_id" value="{{word.id}}">
+                                    <input type="hidden" name="word" value="{{word.word}}">
+                                    <input type="hidden" name="language" value="{{result.language}}">
+                                    <input type="hidden" name="length" value="{{result.length}}">
+                                    <input type="hidden" name="email" value="{{result.email}}">
+                                    <input type="hidden" name="key_word" value="{{result.key_word}}">
+                                    <div class="modal-footer">
+                                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                                        <input type="submit" class="btn btn-danger" value="Delete">
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <!-- Edit Modal HTML -->
-                <div id='editWordModal{{word.id}}' class="modal fade">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <form method="POST" action="{{ url_for( 'edit_system_word') }}">
-                                <div class="modal-header">
-                                    <h4 class="modal-title">Edit Word</h4>
-                                    <button type="button" class="close " data-dismiss="modal" aria-hidden="true">&times;</button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="form-group">
-                                        <label>Word</label>
-                                        <input type="text" name="new_word" class="form-control" value="{{word.word}}">
-                                        <input type="hidden" name="old_word" value="{{word.word}}">
-                                        <input type="hidden" name="language" value="{{result.language}}">
-                                        <input type="hidden" name="length" value="{{result.length}}">
-                                        <input type="hidden" name="key_word" value="{{result.key_word}}">
+                    <!-- Edit Modal HTML -->
+                    <div id='editWordModal{{word.id}}' class="modal fade">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form method="POST" action="{{ url_for( 'edit_custom_word') }}">
+                                    <div class="modal-header">
+                                        <h4 class="modal-title">Edit Word</h4>
+                                        <button type="button" class="close " data-dismiss="modal" aria-hidden="true">&times;</button>
                                     </div>
 
-                                </div>
-                                <div class="modal-footer">
-                                    <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-                                    <input type="submit" class="btn btn-info" value="Save">
-                                </div>
-                            </form>
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <label>ID:</label>
+                                            <input type="text" name="word_id" value="{{word.id}}" readonly> <br>
+                                            <label>Word:</label>
+                                            <input type="text" name="word" value="{{word.word}}"> <br>
+                                            <label>Language: </label>
+                                            <select name="language" class="btn-group">
+                        <option type="button" class="btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" selected>
+            {{word.language}} 
+        </option>
+                        <div class='dropdown-menu'>
+                          {%if word.language == 'English'%}
+                            <option  class="dropdown-item" >Telugu</option>
+                            {%else%}
+                            <option  class="dropdown-item" >
+                                English </option>
+                            {%endif%}
+                        </div>
+                    </select>
+                                            <br>
+                                            <label>Length:</label>
+                                            <input type="text" name="length" value="{{word.length}}" disabled> <br>
+                                            <label>Email:</label>
+                                            <input type="text" name="email" value="{{word.email}}">
+                                        </div>
+
+                                    </div>
+                                    <div class="modal-footer">
+                                        <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
+                                        <input type="submit" class="btn btn-info" value="Update">
+                                    </div>
+                                </form>
+                            </div>
                         </div>
                     </div>
-                </div>
-
+                </td>
             </tr>
             {%endfor%} {%endif%}
         </tbody>
     </table>
     <div class="container ">
         {% for page_num in result.word_list.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %} {% if page_num %} {% if result.word_list.page == page_num %}
-        <a class="btn btn-outline-info mb-4 " href="{{ url_for( 'custom_list', length=result.length, language=result.language, page=page_num) }} ">{{ page_num }}</a> {% else %}
-        <a class="btn btn-outline-info mb-4 " href="{{ url_for( 'custom_list', length=result.length, language=result.language, page=page_num) }} ">{{ page_num }}</a> {% endif %} {% else %} ... {% endif %} {% endfor %}
+        <a class="btn btn-outline-info mb-4 " href="{{ url_for( 'custom_list', length=result.length, language=result.language, page=page_num, key_word=result.key_word, email=result.email) }}">{{ page_num }}</a> {% else %}
+        <a class="btn btn-outline-info mb-4 " href="{{ url_for( 'custom_list', length=result.length, language=result.language, page=page_num, key_word=result.key_word, email=result.email) }} ">{{ page_num }}</a> {% endif %} {% else %} ... {% endif %}
+        {% endfor %}
     </div>
 </div>
 {% endblock body_content %}
