@@ -102,8 +102,24 @@ def isTelugu(ch):
     return (ch >= 0x0C00 and ch <= 0xC7F) or (ch == 0x200C)
 
 
+def isTeluguWord(word):
+    for i in range(len(word)):
+        if not isTelugu(ord(word[i])):
+            return False
+    return True
+
+
 def is_blank_Telugu(hexVal):
     return hexVal in ["c00", "c01", "c02", "c03", "c0d", "c11", "c29", "c34"]
+
+
+def isEnglish(s):
+    try:
+        s.encode(encoding="utf-8").decode("ascii")
+    except UnicodeDecodeError:
+        return False
+    else:
+        return True
 
 
 if __name__ == "__main__":
