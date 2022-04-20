@@ -14,17 +14,17 @@
                                                         <option type="button" class="btn dropdown-toggle " data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" selected>
                                             {{result.language}}
                                         </option>
-                                                        <div class="dropdown-menu ">
-                                                            <option class="dropdown-item " >English</a>
-                                                            <option class="dropdown-item " >Telugu</a>
-                                                        </div>
+                                        <div class='dropdown-menu'>
+                                            {%if result.language == 'English'%}
+                                              <option  class="dropdown-item" >Telugu</option>
+                                              {%else%}
+                                              <option  class="dropdown-item" >
+                                                  English </option>
+                                              {%endif%}
+                                          </div>
                                                     </select><br><br>
                 <label>Word Insert</label>
                 <input id="word_insert_input" class="form-control form-control-lg" type="text" autocomplete="off" name="word_insert" value="{{result.word_insert}}">
-                <br><label>Admin Email</label>
-                <input id="admin_email_input" class="form-control form-control-lg" type="text" autocomplete="off" name="admin_email" value="{{result.email}}">
-                <label>Admin Password</label>
-                <input id="admin_pwd_input" maxlength="60" minlength="2" class="form-control form-control-lg" type="password" autocomplete="off" name="admin_pwd" value="{{result.pwd}}">
             </fieldset>
             <div class="form-group">
                 <button type="submit" id="submit" onclick="" class="btn btn-outline-info">INSERT</button>

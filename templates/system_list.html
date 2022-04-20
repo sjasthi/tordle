@@ -39,6 +39,7 @@
             <tr>
                 <th scope="col">Word</th>
                 <th scope="col">Length</th>
+                <th scope="col">Latest Play Time</th>
                 <th scope="col">Action</th>
             </tr>
         </thead>
@@ -47,10 +48,15 @@
             <tr>
                 <td>{{word.word}}</td>
                 <td>{{word.length}}</td>
+                {%if word.latest_play_time %}
+                <td>{{word.latest_play_time.strftime('%Y-%m-%d, %H:%M:%S')}}</td>
+                {%else%}
+                <td>No One Play Yet </td>
+                {%endif%}
                 <td>
                     <div>
                         <button type="button" data-toggle="modal" data-target='#editWordModal{{word.word}}' class="edit" data-toggle="modal"><i class="material-icons" title="Edit">&#xE254;</i></button>
-                        <button type="button" onclick="console.log( '{{word.word}}')" data-toggle="modal" data-target='#deleteWordModal{{word.word}}' class="delete" data-toggle="modal"><i class="material-icons"  title="Delete ">&#xE872;</i></button>
+                        <button type="button" data-toggle="modal" data-target='#deleteWordModal{{word.word}}' class="delete" data-toggle="modal"><i class="material-icons"  title="Delete ">&#xE872;</i></button>
                     </div>
                     <!-- Delete Modal HTML -->
                     <div class="modal fade" id='deleteWordModal{{word.word}}'>

@@ -1,52 +1,67 @@
-import random
-from main import db
+from config import *
 
 
 class English(db.Model):
     word = db.Column(db.String(100), primary_key=True)
     length = db.Column(db.Integer, nullable=True)
+    latest_play_time = db.Column(db.DateTime)
 
     def __repr__(self):
-        return f"English(word:'{self.word}', length:{self.length})"
+        return f"English(word:'{self.word}', length:{self.length},\
+            latest_play_time:'{self.latest_play_time}')"
 
 
 class Telugu(db.Model):
     word = db.Column(db.String(500), primary_key=True)
     length = db.Column(db.Integer, nullable=True)
-    list_str = db.Column(db.String(5000), unique=True, nullable=True)
+    latest_play_time = db.Column(db.DateTime)
 
     def __repr__(self):
-        return f"Telugu(word:'{self.word}', length:{self.length}, list_str:'{self.list_str}')"
+        return f"Telugu(word:'{self.word}', length:{self.length},\
+            latest_play_time:'{self.latest_play_time}')"
 
 
-class User(db.Model):
-    email = db.Column(db.String(500), primary_key=True)
-    pwd = db.Column(db.String(100), nullable=False)
+class User(db.Model, UserMixin):
+    id = db.Column(db.Integer(), primary_key=True)
+    email = db.Column(db.String(500), unique=True, nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+    role = db.Column(db.String(50), nullable=False, default="member")
+    create_time = db.Column(db.DateTime, default=datetime.utcnow)
+    custom_words = db.relationship(
+        "CustomWord",
+        backref=db.backref("user", lazy=True),
+    )
+    records = db.relationship("Record", backref=db.backref("user", lazy=True))
 
     def __repr__(self):
-        return f"User(Email:'{self.email}', Password:'{self.pwd}')"
+        return f"User(Id:'{self.id}', Email:'{self.email}', Password:'{self.password}',\
+            Role:'{self.role}', Create Time: '{self.create_time}', Custom Word List:'{self.custom_words}')"
 
 
 class CustomWord(db.Model):
-    id = db.Column(
-        db.Integer, db.Sequence("seq_reg_id", start=1000, increment=1), primary_key=True
-    )
-    word = db.Column(db.String(500), nullable=False)
+    __tablename__ = "custom_word"
+    id = db.Column(db.Integer, primary_key=True)
+    word = db.Column(db.String(500), unique=True, nullable=False)
     length = db.Column(db.Integer, nullable=False)
     email = db.Column(db.String(500), nullable=False)
-    language = db.Column(db.String(50), nullable=True)
+    language = db.Column(db.String(50))
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    create_time = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return f"CustomWord(id:'{self.id}', Word:'{self.word}', \
-            Email:'{self.email}', Language:'{self.language}')"
+            Email:'{self.email}', Language:'{self.language}',\
+                User Id:'{self.user_id}' Create Time: '{self.create_time}')"
 
 
-def getRandomWordByLength(length, language):
-    if language == "English":
-        results = English.query.filter_by(length=length).all()
-        result = random.choice(results)
-        return result.word
-    elif language == "Telugu":
-        results = Telugu.query.filter_by(length=length).all()
-        result = random.choice(results)
-        return result
+class Record(db.Model):
+    id = db.Column(db.Integer(), primary_key=True)
+    user_id = db.Column(db.Integer(), db.ForeignKey("user.id"), nullable=False)
+    word = db.Column(db.String(500), nullable=False)
+    is_win = db.Column(db.Boolean(), default=False)
+    state = db.Column(db.String(50))
+    attempt_time = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"Record(Id:'{self.id}', User Id:'{self.user_id}', Word:'{self.word}',\
+            Is Win:'{self.is_win}', State:'{self.state}', Attempt Time:'{self.attempt_time}')"

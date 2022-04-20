@@ -4,18 +4,19 @@
     <nav class="navbar navbar-expand-md navbar-dark bg-steel ">
 
         <div class="container">
-            &ensp; &ensp; &ensp; <a href="{{ url_for('index') }}">Home</a> &ensp;
-            <div class="nav-item dropdown">
-                <div class="dropbtn nav-link  dropdown-toggle" data-bs-toggle="dropdown">Admin
+            &ensp; &ensp; &ensp; <a href="{{ url_for('home') }}">Home</a> &ensp; {%if current_user.is_authenticated%} {%if current_user.role == 'admin'%}
+            <div class="dropdown">
+                <a class="dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Admin
+                </a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="{{ url_for('custom_list') }}"> Custom List </a>
+                    <a class="dropdown-item" href="{{ url_for('system_list_search') }}"> System List </a>
+                    <a class="dropdown-item" href="{{ url_for('user_list') }}"> User List </a>
                 </div>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="{{ url_for('custom_list') }}"> Custom List </a></li>
-                    <li><a class="dropdown-item" href="{{ url_for('system_list_search') }}"> System List </a></li>
-                </ul>
-
             </div>
-            &ensp;
-            <a href="{{ url_for('my_word') }}">My Word</a> &ensp; &ensp; <a href="">Login</a>
+            &ensp; {%endif%}
+            <a href="{{ url_for('my_word')}}">Input My Word</a> {%endif%} &ensp; &ensp; {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('login') }}">Login</a> {%else%} <a href="{{ url_for('logout') }}">Logout</a> {%endif%}
             <h1 class="nav-center navbar-brand me-2 ">Tordle</h1>
             <div class="nav-right">
                 <span class="navbar-brand">{{params.language | title}}</span>
@@ -86,10 +87,14 @@
                                                         <option type="button" class="btn dropdown-toggle " data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" selected>
                                             {{params.language | title}}
                                         </option>
-                                                        <div class="dropdown-menu ">
-                                                            <option class="dropdown-item " >English</a>
-                                                            <option class="dropdown-item " >Telugu</a>
-                                                        </div>
+                                        <div class='dropdown-menu'>
+                                            {%if params.language == 'English'%}
+                                              <option  class="dropdown-item" >Telugu</option>
+                                              {%else%}
+                                              <option  class="dropdown-item" >
+                                                  English </option>
+                                              {%endif%}
+                                          </div>
                                                     </select>
                                     <br><br>
                                     <span class="nav-item">Length &#8195; &#8195;</span>
@@ -118,7 +123,7 @@
                                     <br><br>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="submit" id="go" class="btn btn-outline-info" href="{{url_for('home')}}">GO</button>
+                                    <button type="submit" id="go" class="btn btn-outline-info">GO</button>
                                 </div>
                             </div>
                         </form>
