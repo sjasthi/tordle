@@ -15,14 +15,18 @@
         {% if params and params.language == 'Telugu' %} {% if words.wordCount
         <params.attempt and words.status=='PROCESS' %} {%if params.url%} <form action="{{ url_for('custom_word_post', word_id=params.url) }}" method="post">
             {%else%}
-            <form action="{{ url_for('home') }}" method="post">
-                {%endif%}
+            <form id="submit" action="{{ url_for('home') }}" method="post">
+                <input> {%endif%}
 
                 <fieldset class="form-group">
                     <input id="input" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="teluguHandle" autocomplete="off" name="word">
                 </fieldset>
                 <div class="form-group">
-                    <button type="submit" id="submit" onclick="onClickTelugu()" class="btn btn-outline-info"> SUBMIT</button> {% if words.word_len_test==False %}
+                    <input type="hidden" name="language" value="{{params.language}}">
+                    <input type="hidden" name="length" value="{{params.length}}">
+                    <input type="hidden" name="attempt" value="{{params.attempt}}">
+
+                    <button type="submit" id="submit" class="btn btn-outline-info"> SUBMIT</button> {% if words.word_len_test==False %}
                     <div class="requirements">
                         Must be a valid Word!
                     </div>
@@ -79,6 +83,7 @@
     let solutionWord = words["solution"]
     let guess_word = words["result"]
     let params = JSON.parse('{{params | tojson | safe}}');
+    console.log(params)
     let word_size = params["length"]
     let total_rol = params["attempt"]
         // var canvas_save = null;
@@ -279,7 +284,18 @@
             }
         }
     };
-    const onClickTelugu = () => {};
+    const onClickTelugu = () => {
+        console.log(params)
+            /* var req = new XMLHttpRequest();
+        var url = "/";
+        var send = {
+            "params": params,
+        }
+        req.open("POST", url, true);
+        req.setRequestHeader("Content-type", "application/json");
+        req.send(JSON.stringify(send)); */
+
+    };
     const submitGuess = () => {
         for (let i = 0; i < word_size; i++) {
             setTimeout(() => {

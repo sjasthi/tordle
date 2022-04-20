@@ -43,18 +43,18 @@
                                 </div>
                                 <div class="modal-body">
                                     <br>
-                                    <span class="nav-item" href="">Number of Attempts: {{statics}} &#8195;</span>
+                                    <span class="nav-item" href="">Number of Attempts: {{params.statics.numAttempts}} &#8195;</span>
 
                                     <br><br>
-                                    <span class="nav-item">Percent Wins: &#8195; &#8195;</span>
+                                    <span class="nav-item">Percent Wins: {{params.statics.percentWin}}&#8195; &#8195;</span>
 
 
                                     <br><br>
 
-                                    <span class="nav-item">Winning Streak: &#8195; &#8195;</span>
+                                    <span class="nav-item">Winning Streak: {{params.statics.WinStreak}} &#8195; &#8195;</span>
 
                                     <br><br>
-                                    <span class="nav-item">Best Streak: &#8195; &#8195;</span>
+                                    <span class="nav-item">Best Streak: {{params.statics.bestStreak}}&#8195; &#8195;</span>
 
                                     <br><br>
                                 </div>
@@ -127,7 +127,7 @@
                                     <br><br>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="submit" id="go" class="btn btn-outline-info">GO</button>
+                                    <button type="submit" id="go" href="{{ url_for('home') }}" class="btn btn-outline-info">GO</button>
                                 </div>
                             </div>
                         </form>

@@ -3,6 +3,14 @@
 
 from forms import *
 
+params = {
+    "length": 5,
+    "attempt": 6,
+    "language": "English",
+    "url": "url_for('home')",
+    "statics": {"numAttempts": 0, "percentWin": 0, "WinStreak": 0, "bestStreak": 0},
+}
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -39,17 +47,10 @@ def getRandomWordByLength(length, language):
         return result
 
 
-params = {
-    "length": 5,
-    "attempt": 6,
-    "language": "English",
-    "url": "url_for('home')",
-    "statics": {},
-}
-
+english_random = getRandomWordByLength(params["length"], "English")
 words = {
-    "answer": "group",
-    "solution": "group",
+    "answer": english_random,
+    "solution": english_random,
     "result": [],
     "word_input": "",
     "wordCount": 0,
@@ -58,15 +59,92 @@ words = {
 }
 
 
-def getStatics(current_user, params):
+def getParams():
+    return {
+        "length": 5,
+        "attempt": 6,
+        "language": "English",
+        "url": "url_for('home')",
+        "statics": {"numAttempts": 0, "percentWin": 0, "WinStreak": 0, "bestStreak": 0},
+    }
+
+
+def getStatics(current_user, sendJson, db, params):
+    if sendJson:
+        record = Record(
+            user_id=current_user.id,
+            word=sendJson["answer"],
+            is_win=sendJson["is_win"],
+            state="streak",
+        )
+        db.session.add(record)
+        db.session.commit()
+        print("Record: " + str(record))
     records = Record.query.filter_by(user_id=current_user.id).order_by(Record.id).all()
     if not records:
         return None
+    # Number of Attempts:
+    params["statics"]["numAttempts"] = len(records)
+    # Percent Wins
+    params["statics"]["percentWin"] = (
+        str(
+            100
+            * (1.0 * sum(map(lambda x: 1 if x.is_win else 0, records)) / len(records))
+        )
+        + "%"
+    )
+    # # Winning StreakL
+    records_ = list(records)
+    current_streak = list(map(lambda x: 1 if x.is_win else 0, records_))
+    if current_streak[-1] == 0:
+        params["statics"]["WinStreak"] = 0
+    else:
+        winStreak_count = 0
+        while current_streak and current_streak[-1] != 0:
+            current_streak.pop()
+            winStreak_count += 1
+        params["statics"]["WinStreak"] = winStreak_count
+    # Best strak:
     record_str = "".join(map(lambda x: "1" if x.is_win else "0", records))
-    return record_str
+    ans_list = record_str.split("0")
+    max_len = 0
+    for s in ans_list:
+        if max_len < len(s):
+            max_len = len(s)
+    params["statics"]["bestStreak"] = max_len
+    print("update statics params: ")
+    print(params)
+    return params
+
+
+def refess_data(params, request, words):
+    print(request.form)
+    params["length"] = int(request.form["length"] or params["length"])
+    params["attempt"] = int(request.form["attempt"] or params["attempt"])
+    params["url"] = None
+    if request.form["language"] == "English":
+        params["language"] = "English"
+        english_random = getRandomWordByLength(params["length"], "English")
+        # words["answer"] = english_random
+        # words["solution"] = english_random
+    elif request.form["language"] == "Telugu":
+        params["language"] = "Telugu"
+        # words["result"] = []
+        # words["word_input"] = ""
+        # words["wordCount"] = 0
+        # words["status"] = "PROCESS"
+        # words["word_len_test"] = True
+        # teluguObj = getRandomWordByLength(params["length"], "Telugu")
+        # if teluguObj != "#####":
+        #     words["answer"] = teluguObj.word
+        #     words["solution"] = getTeluguLogicalChars(teluguObj.word)
+        # else:
+        #     words["answer"] = "#####"
+        #     words["solution"] = []
 
 
 def update_data(params, request, words):
+    print(request.form)
     params["length"] = int(request.form["length"] or params["length"])
     params["attempt"] = int(request.form["attempt"] or params["attempt"])
     params["url"] = None

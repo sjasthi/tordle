@@ -1,5 +1,13 @@
 from helper import *
 
+params = {
+    "length": 5,
+    "attempt": 6,
+    "language": "English",
+    "url": "url_for('home')",
+    "statics": {"numAttempts": 0, "percentWin": 0, "WinStreak": 0, "bestStreak": 0},
+}
+
 
 @app.route("/")
 def index():
@@ -8,6 +16,7 @@ def index():
         "attempt": 6,
         "language": "English",
         "url": None,
+        "statics": {"numAttempts": 0, "percentWin": 0, "WinStreak": 0, "bestStreak": 0},
     }
     english_random = getRandomWordByLength(params["length"], "English")
     words = {
@@ -20,32 +29,28 @@ def index():
         "status": "PROCESS",
     }
     if current_user.is_authenticated:
-        print(getStatics(current_user, params))
+        params = getStatics(current_user, request.json, db, params)
     return render_template("index.html", words=words, params=params)
 
 
 @app.route("/", methods=["GET", "POST"])
 def home():
-    if current_user.is_authenticated:
-        print(getStatics(current_user, params))
-        if request.json:
-            record = Record(
-                user_id=current_user.id,
-                word=request.json["answer"],
-                is_win=request.json["is_win"],
-                state="streak",
-            )
-            db.session.add(record)
-            db.session.commit()
-            print("Record: " + str(record))
     if request.form:
-        if len(request.form) > 1:
+        if len(request.form) == 3:
+            params = getParams()
             update_data(params, request, words)
-        elif len(request.form) == 1 and params["language"] == "Telugu":
+            return render_template("index.html", words=words, params=params)
+        elif len(request.form) > 3:  # and params["language"] == "Telugu":
+            params = getParams()
+            refess_data(params, request, words)
             words["word_input"] = request.form["word"]
             getResult(words)
-
-    return render_template("index.html", words=words, params=params)
+            return render_template("index.html", words=words, params=params)
+    if current_user.is_authenticated:
+        params = getParams()
+        params = getStatics(current_user, request.json, db, params)
+        return render_template("index.html", words=words, params=params)
+    return redirect(url_for("index"))
 
 
 # admin@ics499.com -> ics499
@@ -69,7 +74,10 @@ def admin():
         "attempt": 6,
         "language": result["language"],
         "url": None,
+        "statics": {"numAttempts": 0, "percentWin": 0, "WinStreak": 0, "bestStreak": 0},
     }
+    if current_user.is_authenticated:
+        params = getStatics(current_user, request.json, db, params)
     return render_template("admin.html", params=params, result=result)
 
 
@@ -87,7 +95,10 @@ def admin_input():
         "attempt": 6,
         "language": "English",
         "url": None,
+        "statics": {"numAttempts": 0, "percentWin": 0, "WinStreak": 0, "bestStreak": 0},
     }
+    if current_user.is_authenticated:
+        params = getStatics(current_user, request.json, db, params)
     return render_template("admin.html", params=params, result=result)
 
 
@@ -109,7 +120,10 @@ def my_word():
         "attempt": 6,
         "language": result["language"],
         "url": None,
+        "statics": {"numAttempts": 0, "percentWin": 0, "WinStreak": 0, "bestStreak": 0},
     }
+    if current_user.is_authenticated:
+        params = getStatics(current_user, request.json, db, params)
     return render_template("my_word.html", params=params, result=result)
 
 
@@ -125,6 +139,9 @@ def my_word_post():
         "language": "English",
         "url": None,
     }
+    if current_user.is_authenticated:
+        if request.json:
+            params = getStatics(current_user, request.json, db, params)
     return render_template("my_word.html", params=params, result=result)
 
 
@@ -158,16 +175,9 @@ def custom_word_post(word_id):
         if params["language"] == "Telugu":
             words["word_input"] = request.form["word"]
             getResult(words)
-    if request.json:
-        record = Record(
-            user_id=current_user.id,
-            word=request.json["answer"],
-            is_win=request.json["is_win"],
-            state="streak",
-        )
-        db.session.add(record)
-        db.session.commit()
-        print("Record: " + str(record))
+    if current_user.is_authenticated:
+        if request.json:
+            params = getStatics(current_user, request.json, db, params)
     return render_template("index.html", words=words, params=params)
 
 
@@ -293,6 +303,9 @@ def user_list():
     if current_user.role != "admin":
         return abort(403)
     result = get_user_list(request)
+    if current_user.is_authenticated:
+        if request.json:
+            params = getStatics(current_user, request.json, db, params)
     return render_template("user_list.html", result=result, params=params)
 
 
