@@ -138,10 +138,9 @@ def my_word_post():
         "attempt": 6,
         "language": "English",
         "url": None,
+        "statics": {"numAttempts": 0, "percentWin": 0, "WinStreak": 0, "bestStreak": 0},
     }
-    if current_user.is_authenticated:
-        if request.json:
-            params = getStatics(current_user, request.json, db, params)
+    params = getStatics(current_user, request.json, db, params)
     return render_template("my_word.html", params=params, result=result)
 
 
@@ -175,9 +174,8 @@ def custom_word_post(word_id):
         if params["language"] == "Telugu":
             words["word_input"] = request.form["word"]
             getResult(words)
-    if current_user.is_authenticated:
-        if request.json:
-            params = getStatics(current_user, request.json, db, params)
+    params = getParams()
+    params = getStatics(current_user, request.json, db, params)
     return render_template("index.html", words=words, params=params)
 
 
@@ -189,6 +187,8 @@ def custom_list():
     if current_user.role != "admin":
         return abort(403)
     result = get_custom_list(request)
+    params = getParams()
+    params = getStatics(current_user, request.json, db, params)
     return render_template("custom_list.html", result=result, params=params)
 
 
@@ -222,6 +222,8 @@ def system_list_search():
     if current_user.role != "admin":
         return abort(403)
     result = get_system_list_search(request)
+    params = getParams()
+    params = getStatics(current_user, request.json, db, params)
     return render_template("system_list.html", result=result, params=params)
 
 
