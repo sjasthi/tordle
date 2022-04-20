@@ -38,6 +38,8 @@ def home():
     if request.form:
         if len(request.form) == 3:
             params = getParams()
+            if current_user.is_authenticated:
+                params = getStatics(current_user, request.json, db, params)
             update_data(params, request, words)
             return render_template("index.html", words=words, params=params)
         elif len(request.form) > 3:  # and params["language"] == "Telugu":
