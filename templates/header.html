@@ -4,7 +4,7 @@
     <nav class="navbar navbar-expand-md navbar-dark bg-steel ">
 
         <div class="container">
-            &ensp; &ensp; &ensp; <a href="{{ url_for('home') }}">Home</a> &ensp; {%if current_user.is_authenticated%} {%if current_user.role == 'admin'%}
+            <svg class="bi bi-bar-chart-line" data-toggle="modal" data-target="#ModalAbout" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="32" height="32" viewBox="0 0 32 32" style=" fill:currentColor"><path d="M 2 6 L 2 26 L 7 26 L 7 31.09375 L 8.625 29.78125 L 13.34375 26 L 30 26 L 30 6 Z M 4 8 L 28 8 L 28 24 L 12.65625 24 L 12.375 24.21875 L 9 26.90625 L 9 24 L 4 24 Z M 15 10 L 15 12 L 17 12 L 17 10 Z M 15 14 L 15 22 L 17 22 L 17 14 Z"></path></svg>            &ensp; &ensp; &ensp; <a href="{{ url_for('home') }}">Home</a> &ensp; {%if current_user.is_authenticated%} {%if current_user.role == 'admin'%}
             <div class="dropdown">
                 <a class="dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Admin
                 </a>
