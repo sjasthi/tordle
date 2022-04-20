@@ -1,5 +1,6 @@
-{% extends 'header.html' %} {% block body_content %}
+{% extends 'header.html' %} {% block body_content %} {%if words.answer != "#####"%}
 <div id="image" class="center">
+
     <section class="game">
         {%for i in range(1,(params.attempt + 1))%}
         <div id="guess{{i}}" class="guess" data-letters="" style="grid-template-columns: repeat({{params.length}}, 1fr)">
@@ -14,14 +15,18 @@
         {% if params and params.language == 'Telugu' %} {% if words.wordCount
         <params.attempt and words.status=='PROCESS' %} {%if params.url%} <form action="{{ url_for('custom_word_post', word_id=params.url) }}" method="post">
             {%else%}
-            <form action="{{ url_for('home') }}" method="post">
-                {%endif%}
+            <form id="submit" action="{{ url_for('home') }}" method="post">
+                <input> {%endif%}
 
                 <fieldset class="form-group">
                     <input id="input" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="teluguHandle" autocomplete="off" name="word">
                 </fieldset>
                 <div class="form-group">
-                    <button type="submit" id="submit" onclick="onClickTelugu()" class="btn btn-outline-info"> SUBMIT</button> {% if words.word_len_test==False %}
+                    <input type="hidden" name="language" value="{{params.language}}">
+                    <input type="hidden" name="length" value="{{params.length}}">
+                    <input type="hidden" name="attempt" value="{{params.attempt}}">
+
+                    <button type="submit" id="submit" class="btn btn-outline-info"> SUBMIT</button> {% if words.word_len_test==False %}
                     <div class="requirements">
                         Must be a valid Word!
                     </div>
@@ -34,6 +39,7 @@
             <button type="submit" id="cripboard" onclick="cripboard()" class="btn btn-outline-info">Copy Image to Share</button>
             <br> <br>
             <h1 class="green-win">Yes! You Win.</h1>
+
             {%endif%} {%endif%} {% else %}
             <fieldset class="form-group">
                 <input id="input" maxlength="{{params.length}}" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="handleInput" autocomplete="off" name="word">
@@ -70,7 +76,10 @@
     let currentGuessCount = 1;
     let currentGuess = document.querySelector('#guess' + currentGuessCount);
     let words = JSON.parse('{{words | tojson | safe}}');
+    let english_row = [];
+
     console.log(words)
+
     let solutionWord = words["solution"]
     let guess_word = words["result"]
     let params = JSON.parse('{{params | tojson | safe}}');
@@ -78,6 +87,20 @@
     let word_size = params["length"]
     let total_rol = params["attempt"]
         // var canvas_save = null;
+
+
+
+    const sendArrayToFlask = (is_win) => {
+        var req = new XMLHttpRequest();
+        var url = "/";
+        var send = {
+            "is_win": is_win,
+            "answer": words["answer"],
+        }
+        req.open("POST", url, true);
+        req.setRequestHeader("Content-type", "application/json");
+        req.send(JSON.stringify(send));
+    }
 
     function getImageBlobFromUrl(url) {
         const fetchedImageData = fetch(url).then(() => {
@@ -128,6 +151,7 @@
         if (words["word_len_test"] == false) {
             setTitleTelugu(guess_word.length);
             document.getElementById('input').value = words["word_input"];
+
         } else {
             if (guess_word.length == 1) {
                 setTilesTeluguForFlip(0);
@@ -136,9 +160,12 @@
                     setTimeout(() => {
                         jumpTiles(word_size, 1);
                     }, 500);
+                    console.log("Try Telugu SUCCESS, Record!")
+                    sendArrayToFlask(true);
                 } else {
                     document.getElementById('input').value = words["word_input"];
                     submitTelugu(0);
+
                 }
             } else if (guess_word.length > 1) {
                 let n = guess_word.length - 1;
@@ -149,11 +176,17 @@
                     setTimeout(() => {
                         jumpTiles(word_size, n + 1);
                     }, 500);
+                    console.log("Try Telugu SUCCESS, Record!")
+                    sendArrayToFlask(true);
                 } else {
                     if (guess_word.length < total_rol) {
                         document.getElementById('input').value = words["word_input"];
+                    } else {
+                        sendArrayToFlask(false);
+                        console.log("Try Telugu Fail, Record!")
                     }
                     submitTelugu(n);
+
                 }
             }
         }
@@ -195,6 +228,7 @@
                 }
             } else {
                 again();
+                showSolution(solutionWord);
             }
         });
     };
@@ -244,12 +278,24 @@
     const onClick = () => {
         if (currentGuessCount <= total_rol) {
             if (currentGuess.dataset.letters.length == word_size) {
+                english_row.push(document.getElementById('input').value);
                 document.getElementById('input').value = "";
                 submitGuess();
             }
         }
     };
-    const onClickTelugu = () => {};
+    const onClickTelugu = () => {
+        console.log(params)
+            /* var req = new XMLHttpRequest();
+        var url = "/";
+        var send = {
+            "params": params,
+        }
+        req.open("POST", url, true);
+        req.setRequestHeader("Content-type", "application/json");
+        req.send(JSON.stringify(send)); */
+
+    };
     const submitGuess = () => {
         for (let i = 0; i < word_size; i++) {
             setTimeout(() => {
@@ -264,6 +310,8 @@
                 setTimeout(() => {
                     jumpTiles(word_size, currentGuessCount);
                 }, 500);
+                console.log("Try English SUCCESS, Record!")
+                sendArrayToFlask(true); // send data to flask.
                 again();
                 //share();
                 cripboardBTN();
@@ -275,6 +323,8 @@
                     setTimeout(() => {
                         showSolution(solutionWord);
                     }, 500);
+                    console.log("Try English Fail, Record!")
+                    sendArrayToFlask(false);
                     again();
                 }
             }
@@ -290,5 +340,14 @@
     };
 </script>
 
-
+{%else%}
+<div class="center">
+    <h1>Our System is Run out of Word of Length {{params.length}} for Today!
+    </h1>
+    <h1>
+        Please Wait for next Day to Play the Game</h1>
+    <h1>
+        Or Input Your own Word to Play the Game</h1>
+</div>
+{%endif%}
 <br> {% endblock body_content %}

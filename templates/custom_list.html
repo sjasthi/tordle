@@ -1,7 +1,6 @@
 {% extends 'header.html' %} {% block body_content %}
 <div class="container">
     <span style="font-size: 30px;">Custome Word List &#8195; &#8195;&#8195;&#8195;&#8195;</span>
-    <a href="#" id="add_word" class="btn btn-outline-info">Add New User</a> <br> <br>
     <form class="form-select form-select-lg mb-3" method="POST" action="{{ url_for('custom_list') }}">
         <label>Key Word: </label> <input name="key_word" value="{{result.key_word}}"> &#8195;<label>Email: </label> <input name="email" value="{{result.email}}"> &#8195;
         <span>Language </span>
@@ -37,6 +36,7 @@
                 <th scope="col ">Length</th>
                 <th scope="col ">Language</th>
                 <th scope="col ">Email</th>
+                <th scope="col ">Created Time</th>
                 <th scope="col ">Action</th>
             </tr>
         </thead>
@@ -48,10 +48,11 @@
                 <td>{{word.length}}</td>
                 <td>{{word.language}}</td>
                 <td>{{word.email}}</td>
+                <td>{{word.create_time.strftime('%Y-%m-%d, %H:%M:%S')}}</td>
                 <td>
                     <div>
                         <button type="button" data-toggle="modal" data-target='#editWordModal{{word.id}}' class="edit" data-toggle="modal"><i class="material-icons" title="Edit">&#xE254;</i></button>
-                        <button type="button" onclick="console.log( '{{word.word}}')" data-toggle="modal" data-target='#deleteWordModal{{word.id}}' class="delete" data-toggle="modal"><i class="material-icons"  title="Delete ">&#xE872;</i></button>
+                        <button type="button" data-toggle="modal" data-target='#deleteWordModal{{word.id}}' class="delete" data-toggle="modal"><i class="material-icons"  title="Delete ">&#xE872;</i></button>
                     </div>
                     <!-- Delete Modal HTML -->
                     <div class="modal fade" id='deleteWordModal{{word.id}}'>
@@ -115,7 +116,7 @@
                                             <label>Length:</label>
                                             <input type="text" name="length" value="{{word.length}}" disabled> <br>
                                             <label>Email:</label>
-                                            <input type="text" name="email" value="{{word.email}}">
+                                            <input type="text" name="email" value="{{word.email}}" readonly>
                                         </div>
 
                                     </div>

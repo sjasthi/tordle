@@ -4,24 +4,25 @@
     <nav class="navbar navbar-expand-md navbar-dark bg-steel ">
 
         <div class="container">
-            &ensp; &ensp; &ensp; <a href="{{ url_for('index') }}">Home</a> &ensp;
-            <div class="nav-item dropdown">
-                <div class="dropbtn nav-link  dropdown-toggle" data-bs-toggle="dropdown">Admin
+            <svg class="bi bi-bar-chart-line" data-toggle="modal" data-target="#ModalAbout" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="32" height="32" viewBox="0 0 32 32" style=" fill:currentColor"><path d="M 2 6 L 2 26 L 7 26 L 7 31.09375 L 8.625 29.78125 L 13.34375 26 L 30 26 L 30 6 Z M 4 8 L 28 8 L 28 24 L 12.65625 24 L 12.375 24.21875 L 9 26.90625 L 9 24 L 4 24 Z M 15 10 L 15 12 L 17 12 L 17 10 Z M 15 14 L 15 22 L 17 22 L 17 14 Z"></path></svg>            &ensp; &ensp; &ensp; <a href="{{ url_for('home') }}">Home</a> &ensp; {%if current_user.is_authenticated%} {%if current_user.role == 'admin'%}
+            <div class="dropdown">
+                <a class="dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Admin
+                </a>
+                <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                    <a class="dropdown-item" href="{{ url_for('custom_list') }}"> Custom List </a>
+                    <a class="dropdown-item" href="{{ url_for('system_list_search') }}"> System List </a>
+                    <a class="dropdown-item" href="{{ url_for('user_list') }}"> User List </a>
                 </div>
-                <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="{{ url_for('custom_list') }}"> Custom List </a></li>
-                    <li><a class="dropdown-item" href="{{ url_for('system_list_search') }}"> System List </a></li>
-                </ul>
-
             </div>
-            &ensp;
-            <a href="{{ url_for('my_word') }}">My Word</a> &ensp; &ensp; <a href="">Login</a>
+            &ensp; {%endif%}
+            <a href="{{ url_for('my_word')}}">Input My Word</a> {%endif%} &ensp; &ensp; {% if not current_user.is_authenticated %}
+            <a href="{{ url_for('login') }}">Login</a> {%else%} <a href="{{ url_for('logout') }}">Logout</a> {%endif%}
             <h1 class="nav-center navbar-brand me-2 ">Tordle</h1>
             <div class="nav-right">
                 <span class="navbar-brand">{{params.language | title}}</span>
                 <span>
                     &#8195;
-                </span>
+                </span> {%if current_user.is_authenticated%}
                 <svg data-toggle="modal" data-target="#ModalStatic" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bar-chart-line" viewBox="0 0 16 16">
                                 <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-3 0V7H7v7h2zm-5 0v-3H2v3h2z"/>
                               </svg>
@@ -42,15 +43,18 @@
                                 </div>
                                 <div class="modal-body">
                                     <br>
-                                    <span class="nav-item" href="">Static 1 &#8195;</span>
+                                    <span class="nav-item" href="">Number of Attempts: {{params.statics.numAttempts}} &#8195;</span>
 
                                     <br><br>
-                                    <span class="nav-item">Static 2 &#8195; &#8195;</span>
+                                    <span class="nav-item">Percent Wins: {{params.statics.percentWin}}&#8195; &#8195;</span>
 
 
                                     <br><br>
 
-                                    <span class="nav-item">Static 3 &#8195; &#8195;</span>
+                                    <span class="nav-item">Winning Streak: {{params.statics.WinStreak}} &#8195; &#8195;</span>
+
+                                    <br><br>
+                                    <span class="nav-item">Best Streak: {{params.statics.bestStreak}}&#8195; &#8195;</span>
 
                                     <br><br>
                                 </div>
@@ -61,6 +65,7 @@
                         </form>
                     </div>
                 </div>
+                {%endif%}
                 <!-- end Static Modal -->
 
                 <svg type="button" data-toggle="modal" data-target="#ModalSetting" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">
@@ -86,10 +91,14 @@
                                                         <option type="button" class="btn dropdown-toggle " data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" selected>
                                             {{params.language | title}}
                                         </option>
-                                                        <div class="dropdown-menu ">
-                                                            <option class="dropdown-item " >English</a>
-                                                            <option class="dropdown-item " >Telugu</a>
-                                                        </div>
+                                        <div class='dropdown-menu'>
+                                            {%if params.language == 'English'%}
+                                              <option  class="dropdown-item" >Telugu</option>
+                                              {%else%}
+                                              <option  class="dropdown-item" >
+                                                  English </option>
+                                              {%endif%}
+                                          </div>
                                                     </select>
                                     <br><br>
                                     <span class="nav-item">Length &#8195; &#8195;</span>
@@ -118,7 +127,7 @@
                                     <br><br>
                                 </div>
                                 <div class="modal-footer">
-                                    <button type="submit" id="go" class="btn btn-outline-info" href="{{url_for('home')}}">GO</button>
+                                    <button type="submit" id="go" href="{{ url_for('home') }}" class="btn btn-outline-info">GO</button>
                                 </div>
                             </div>
                         </form>

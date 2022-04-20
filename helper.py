@@ -1,13 +1,52 @@
-"""Author: Nalongsone Danddank, Assignment #4, Feb 2 2022, ICS499 METRO STATE """
-
-import requests
-import json
-from models import *
-from telugu import getTeluguLogicalChars, isTeluguWord, isEnglish
-from flask import flash
+"""Author: Nalongsone Danddank, Final Project, begin on Feb 2 2022, ICS499 METRO STATE """
 
 
-params = {"length": 5, "attempt": 6, "language": "English", "url": "url_for('home')"}
+from forms import *
+
+params = {
+    "length": 5,
+    "attempt": 6,
+    "language": "English",
+    "url": "url_for('home')",
+    "statics": {"numAttempts": 0, "percentWin": 0, "WinStreak": 0, "bestStreak": 0},
+}
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+
+def getRandomWordByLength(length, language):
+    if language == "English":
+        results = (
+            English.query.filter_by(length=length)
+            .filter(func.DATE(English.latest_play_time).isnot(date.today()))
+            .all()
+        )
+        if not results:
+            return "#####"
+        result = random.choice(results)
+        english = English.query.filter_by(word=result.word).first()
+        english.latest_play_time = datetime.now()
+        db.session.commit()
+        return result.word
+    elif language == "Telugu":
+
+        results = (
+            Telugu.query.filter_by(length=length)
+            .filter(func.DATE(Telugu.latest_play_time).isnot(date.today()))
+            .all()
+        )
+        if not results:
+            return "#####"
+        result = random.choice(results)
+        telugu = Telugu.query.filter_by(word=result.word).first()
+        telugu.latest_play_time = datetime.now()
+        db.session.commit()
+        return result
+
+
 english_random = getRandomWordByLength(params["length"], "English")
 words = {
     "answer": english_random,
@@ -20,7 +59,92 @@ words = {
 }
 
 
+def getParams():
+    return {
+        "length": 5,
+        "attempt": 6,
+        "language": "English",
+        "url": "url_for('home')",
+        "statics": {"numAttempts": 0, "percentWin": 0, "WinStreak": 0, "bestStreak": 0},
+    }
+
+
+def getStatics(current_user, sendJson, db, params):
+    if sendJson:
+        record = Record(
+            user_id=current_user.id,
+            word=sendJson["answer"],
+            is_win=sendJson["is_win"],
+            state="streak",
+        )
+        db.session.add(record)
+        db.session.commit()
+        print("Record: " + str(record))
+    records = Record.query.filter_by(user_id=current_user.id).order_by(Record.id).all()
+    if not records:
+        return None
+    # Number of Attempts:
+    params["statics"]["numAttempts"] = len(records)
+    # Percent Wins
+    params["statics"]["percentWin"] = (
+        str(
+            100
+            * (1.0 * sum(map(lambda x: 1 if x.is_win else 0, records)) / len(records))
+        )
+        + "%"
+    )
+    # # Winning StreakL
+    records_ = list(records)
+    current_streak = list(map(lambda x: 1 if x.is_win else 0, records_))
+    if current_streak[-1] == 0:
+        params["statics"]["WinStreak"] = 0
+    else:
+        winStreak_count = 0
+        while current_streak and current_streak[-1] != 0:
+            current_streak.pop()
+            winStreak_count += 1
+        params["statics"]["WinStreak"] = winStreak_count
+    # Best strak:
+    record_str = "".join(map(lambda x: "1" if x.is_win else "0", records))
+    ans_list = record_str.split("0")
+    max_len = 0
+    for s in ans_list:
+        if max_len < len(s):
+            max_len = len(s)
+    params["statics"]["bestStreak"] = max_len
+    print("update statics params: ")
+    print(params)
+    return params
+
+
+def refess_data(params, request, words):
+    print(request.form)
+    params["length"] = int(request.form["length"] or params["length"])
+    params["attempt"] = int(request.form["attempt"] or params["attempt"])
+    params["url"] = None
+    if request.form["language"] == "English":
+        params["language"] = "English"
+        english_random = getRandomWordByLength(params["length"], "English")
+        # words["answer"] = english_random
+        # words["solution"] = english_random
+    elif request.form["language"] == "Telugu":
+        params["language"] = "Telugu"
+        # words["result"] = []
+        # words["word_input"] = ""
+        # words["wordCount"] = 0
+        # words["status"] = "PROCESS"
+        # words["word_len_test"] = True
+        # teluguObj = getRandomWordByLength(params["length"], "Telugu")
+        # if teluguObj != "#####":
+        #     words["answer"] = teluguObj.word
+        #     words["solution"] = getTeluguLogicalChars(teluguObj.word)
+        # else:
+        #     words["answer"] = "#####"
+        #     words["solution"] = []
+
+
 def update_data(params, request, words):
+    print(request.form)
     params["length"] = int(request.form["length"] or params["length"])
     params["attempt"] = int(request.form["attempt"] or params["attempt"])
     params["url"] = None
@@ -37,29 +161,33 @@ def update_data(params, request, words):
         words["status"] = "PROCESS"
         words["word_len_test"] = True
         teluguObj = getRandomWordByLength(params["length"], "Telugu")
-        words["answer"] = teluguObj.word
-        words["solution"] = getTeluguLogicalChars(teluguObj.word)
+        if teluguObj != "#####":
+            words["answer"] = teluguObj.word
+            words["solution"] = getTeluguLogicalChars(teluguObj.word)
+        else:
+            words["answer"] = "#####"
+            words["solution"] = []
 
 
-def getCharsFromAPI(string, language):
-    """@string: String for api params
-    @language: String for api params"""
-    URL_char = "https://indic-wp.thisisjava.com/api/getLogicalChars.php"
-    # URL_char = "http://localhost/indic-wp//api/getLogicalChars.php"
-    params = {"string": string, "language": language}
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"
-    }
-    # get text or string that request from API
-    r_chars = requests.get(url=URL_char, params=params, headers=headers, timeout=50)
-    # handle text like json format from api by encode and decode the string.
-    text = r_chars.text
-    if text.startswith("\ufeff"):
-        text = text.encode("utf8")[6:].decode("utf8")
-    # convert text to dictionary by json
-    data = json.loads(text)
+# def getCharsFromAPI(string, language):
+#     """@string: String for api params
+#     @language: String for api params"""
+#     URL_char = "https://indic-wp.thisisjava.com/api/getLogicalChars.php"
+#     # URL_char = "http://localhost/indic-wp//api/getLogicalChars.php"
+#     params = {"string": string, "language": language}
+#     headers = {
+#         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36"
+#     }
+#     # get text or string that request from API
+#     r_chars = requests.get(url=URL_char, params=params, headers=headers, timeout=50)
+#     # handle text like json format from api by encode and decode the string.
+#     text = r_chars.text
+#     if text.startswith("\ufeff"):
+#         text = text.encode("utf8")[6:].decode("utf8")
+#     # convert text to dictionary by json
+#     data = json.loads(text)
 
-    return data["data"]
+#     return data["data"]
 
 
 STATUS = ["PROCESS", "SUCCESS", "END"]
@@ -118,79 +246,25 @@ def getResult(words):
         words["word_len_test"] = False
 
 
-def englishFile2db(file, db, English):
-    # db.drop_all()
-    # db.create_all()
-    with open(file, "r") as f:
-        for line in f:
-            word = line.strip().lower()
-            size = len(word)
-            if size >= 3:
-                eng = English(word=word, length=size)
-                db.session.add(eng)
-        db.session.commit()
-
-
-def teluguFile2db(file, db, Telugu):
-    # db.drop_all()
-    # db.create_all()
-    with open(file, "r") as f:
-        for line in f:
-            word = line.strip()
-            l = getTeluguLogicalChars(word)
-            size = len(l)
-            l_str = json.dumps(l)
-            tlg = Telugu(word=word, length=size, list_str=l_str)
-            db.session.add(tlg)
-        db.session.commit()
-
-    # for t in guess_ts:
-    #     word = t.strip()
-    #     l = getTeluguLogicalChars(word)
-    #     size = len(l)
-    #     l_str = json.dumps(l)
-    #     tlg = Telugu(word=word, length=size, list_str=l_str)
-    #     db.session.add(tlg)
-    # db.session.commit()
-
-
-def insert_word_(request, result):
-    result["language"] = request.form["language"]
-    result["email"] = request.form["admin_email"]
-    result["pwd"] = request.form["admin_pwd"]
-    result["word_insert"] = request.form["word_insert"]
-    result["PASS"] = True
-    print(result)
-    ss = User.query.all()
-    print(ss)
-    # user = User(email="pink@ics499.com", pwd="pink")
-    # db.session.add(user)
-    # db.session.commit()
-
-
 # admin@ics499.com -> ics499
 def insert_word(request, db):
     result = {
         "language": request.form["language"],
-        "email": request.form["admin_email"],
-        "pwd": request.form["admin_pwd"],
         "word_insert": request.form["word_insert"].strip(),
         "PASS": False,
         "message": "Email Wrong!",
     }
-    user = User.query.filter_by(email=result["email"]).first()
-    if not user:
-        return result
-    if user.pwd != result["pwd"]:
-        result["message"] = "Password Wrong!"
-        return result
 
     if result["language"] == "English":
-        temp = English.query.filter_by(word=result["word_insert"].lower()).first()
+        word_insert = result["word_insert"].strip().lower()
+        if not isEnglish(word_insert):
+            flash("You have input correct English word!", "danger")
+            return result
+        temp = English.query.filter_by(word=word_insert).first()
         if not temp:
             english = English(
-                word=result["word_insert"],
-                length=len(result["word_insert"]),
+                word=word_insert,
+                length=len(word_insert),
             )
             db.session.add(english)
             db.session.commit()
@@ -200,77 +274,87 @@ def insert_word(request, db):
             return result
 
     elif result["language"] == "Telugu":
-        temp = Telugu.query.filter_by(word=result["word_insert"]).first()
+        word_insert = result["word_insert"].strip()
+        if not isTeluguWord(word_insert):
+            flash("You have input correct Telugu word!", "danger")
+            return result
+        temp = Telugu.query.filter_by(word=word_insert).first()
         if not temp:
-            arr = getTeluguLogicalChars(result["word_insert"])
-            telugu = Telugu(
-                word=result["word_insert"], length=len(arr), list_str=json.dumps(arr)
-            )
+            arr = getTeluguLogicalChars(word_insert)
+            telugu = Telugu(word=word_insert, length=len(arr))
             db.session.add(telugu)
             db.session.commit()
             result["word_insert"] = ""
             result["PASS"] = True
             result["message"] = "Input Telugu Word Success!"
             return result
-    result["message"] = "The word already exit!"
+    result["message"] = "The word already exit in the System!"
     return result
 
 
-def generate_id(request, db):
+def generate_id(request, db, current_user):
     result = {
         "language": request.form["language"],
-        "email": request.form["email"],
-        "pwd": request.form["pwd"],
         "word_insert": request.form["word"].strip(),
         "PASS": False,
         "message": "Email or Password Wrong!",
     }
-    user = User.query.filter_by(email=result["email"]).first()
-    if user and user.pwd == result["pwd"]:
-        if result["language"] == "English":
-            temp = CustomWord.query.filter_by(
-                word=result["word_insert"].lower()
-            ).first()
-            print(temp)
-            if not temp:
-                length = len(result["word_insert"].lower())
-                word = result["word_insert"].lower()
-            else:
-                result["message"] = (
-                    "The word already input by :\n\t\t"
-                    + temp.email
-                    + "\nThe exit link is: \n\t\t"
-                    + "https://tordle.pythonanywhere.com/my_word/"
-                    + str(temp.id)
-                )
-                return result
-        elif result["language"] == "Telugu":
-            temp = CustomWord.query.filter_by(word=result["word_insert"]).first()
-            if not temp:
-                arr = getTeluguLogicalChars(result["word_insert"])
-                length = len(arr)
-                word = result["word_insert"]
-            else:
-                result["message"] = (
-                    "The word already input by :\n\t\t"
-                    + temp.email
-                    + "\nThe exit link is: \n\t\t"
-                    + "https://tordle.pythonanywhere.com/my_word/"
-                    + str(temp.id)
-                )
-                return result
+    print(result)
+    word = None
+    if result["language"] == "English":
+        word_insert = (result["word_insert"]).lower()
+        if not isEnglish(word_insert):
+            flash("You have input correct English word!", "danger")
+            result["message"] = "You have input correct English word!"
+            return result
+        temp = CustomWord.query.filter_by(word=word_insert).first()
+        if not temp:
+            length = len(word_insert)
+            word = word_insert
+        else:
+            result["message"] = (
+                "The word already input by :\n\t\t"
+                + temp.email
+                + "\nThe exit link is: \n\t\t"
+                + "https://tordle.pythonanywhere.com/my_word/"
+                + str(temp.id)
+            )
+            return result
+    elif result["language"] == "Telugu":
+        word_insert = result["word_insert"].strip()
+        if not isTeluguWord(word_insert):
+            flash("You have input correct Telugu word!", "danger")
+            result["message"] = "You have input correct Telugu word!"
+            return result
+        temp = CustomWord.query.filter_by(word=word_insert).first()
+        if not temp:
+            arr = getTeluguLogicalChars(word_insert)
+            length = len(arr)
+            word = word_insert
+        else:
+            result["message"] = (
+                "The word already input by :\n\t\t"
+                + temp.email
+                + "\nThe exit link is: \n\t\t"
+                + "https://tordle.pythonanywhere.com/my_word/"
+                + str(temp.id)
+            )
+            return result
+    if word:
+        print(word)
         cw = CustomWord(
             word=word,
             length=length,
-            email=request.form["email"],
+            email=current_user.email,
             language=result["language"],
+            user_id=current_user.id,
+            create_time=datetime.utcnow(),
         )
         db.session.add(cw)
-        db.session.flush()
+        # db.session.flush()
         db.session.commit()
-        cw_id = cw.id
         result["word_insert"] = ""
-        result["message"] = r"https://tordle.pythonanywhere.com/my_word/" + str(cw_id)
+        result["message"] = r"https://tordle.pythonanywhere.com/my_word/" + str(cw.id)
     return result
 
 
@@ -506,7 +590,6 @@ def handle_delete_custom_word(request, word_id):
 
 
 def handle_edit_custom_word(request):
-    print(request.form)
     id = int(request.form["word_id"])
     word = CustomWord.query.get_or_404(id)
     if word.word != (request.form["word"]).strip():
@@ -518,7 +601,154 @@ def handle_edit_custom_word(request):
             word.length = len(arr)
     if word.language != request.form["language"]:
         word.language = request.form["language"]
-    if word.email != (request.form["email"]).strip():
-        word.email = (request.form["email"]).strip()
     db.session.commit()
     flash("Your word has been Updated from List!", "success")
+
+
+def get_user_list(request):
+    page = request.args.get("page", 1, type=int)
+    users = User.query.order_by(User.id).paginate(page=page, per_page=15)
+    result["users"] = users
+    return result
+
+
+def handle_edit_user(request):
+    id = int(request.form["user_id"])
+    user = User.query.get_or_404(id)
+    user.email = request.form["email"].strip()
+    user.password = request.form["password"].strip()
+    user.role = request.form["role"]
+    db.session.commit()
+    flash("Your word has been Updated from List!", "success")
+
+
+def englishFile2db(file, db, English):
+    # db.drop_all()
+    # db.create_all()
+    with open(file, "r") as f:
+        for line in f:
+            word = line.strip().lower()
+            size = len(word)
+            if size >= 3:
+                eng = English(word=word, length=size)
+                db.session.add(eng)
+        db.session.commit()
+
+
+def teluguFile2db(file, db, Telugu):
+    # db.drop_all()
+    # db.create_all()
+    with open(file, "r") as f:
+        for line in f:
+            word = line.strip()
+            l = getTeluguLogicalChars(word)
+            size = len(l)
+            tlg = Telugu(word=word, length=size)
+            db.session.add(tlg)
+        db.session.commit()
+
+
+def initUser(db, User):
+    user_admin = User(
+        email="admin@ics499.com",
+        password="ics499",
+        role="admin",
+    )
+    db.session.add(user_admin)
+    user1 = User(
+        email="ping@ics499.com",
+        password="ics499",
+        role="member",
+    )
+    db.session.add(user1)
+    user2 = User(
+        email="ics499@gmail.com",
+        password="spring22",
+        role="member",
+    )
+    db.session.add(user2)
+    user3 = User(
+        email="ics325@gmail.com",
+        password="summer21",
+        role="member",
+    )
+    db.session.add(user3)
+    db.session.commit()
+
+
+def initCustomWord(db, CustomWord):
+    w1 = CustomWord(
+        word="input", length=5, language="English", email="admin@ics499.com", user_id=1
+    )
+    db.session.add(w1)
+    w2 = CustomWord(
+        word="output", length=6, language="English", email="admin@ics499.com", user_id=1
+    )
+    db.session.add(w2)
+
+    w3 = CustomWord(
+        word="తెలియకపోతే",
+        length=6,
+        language="Telugu",
+        email="admin@ics499.com",
+        user_id=1,
+    )
+    db.session.add(w3)
+    w4 = CustomWord(
+        word="ప్రతిభాసామర్ధ్యాల",
+        length=7,
+        language="Telugu",
+        email="admin@ics499.com",
+        user_id=1,
+    )
+    db.session.add(w4)
+    w5 = CustomWord(
+        word="test",
+        length=4,
+        language="English",
+        email="ping@ics499.com",
+        user_id=2,
+    )
+    db.session.add(w5)
+    w6 = CustomWord(
+        word="college",
+        length=7,
+        language="English",
+        email="	ics499@gmail.com",
+        user_id=3,
+    )
+    db.session.add(w6)
+    w7 = CustomWord(
+        word="matter",
+        length=6,
+        language="English",
+        email="	ics325@gmail.com",
+        user_id=4,
+    )
+    db.session.add(w7)
+    w8 = CustomWord(
+        word="gamer",
+        length=5,
+        language="English",
+        email="	ics325@gmail.com",
+        user_id=4,
+    )
+    db.session.add(w8)
+    w9 = CustomWord(
+        word="ఆరంభమవుతాయి",
+        length=7,
+        language="Telugu",
+        email="	ics325@gmail.com",
+        user_id=4,
+    )
+    db.session.add(w9)
+    db.session.commit()
+
+
+def initRecord(db, Record):
+    r1 = Record(user_id=1, word="input", is_win=True, state="begin")
+    db.session.add(r1)
+    r2 = Record(user_id=1, word="output", is_win=False, state="streak")
+    db.session.add(r2)
+    db.session.commit()
+    pass
