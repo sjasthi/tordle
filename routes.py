@@ -19,12 +19,15 @@ def index():
         "word_len_test": True,
         "status": "PROCESS",
     }
+    if current_user.is_authenticated:
+        print(getStatics(current_user, params))
     return render_template("index.html", words=words, params=params)
 
 
 @app.route("/", methods=["GET", "POST"])
 def home():
     if current_user.is_authenticated:
+        print(getStatics(current_user, params))
         if request.json:
             record = Record(
                 user_id=current_user.id,

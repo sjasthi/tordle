@@ -22,7 +22,7 @@
                 <span class="navbar-brand">{{params.language | title}}</span>
                 <span>
                     &#8195;
-                </span>
+                </span> {%if current_user.is_authenticated%}
                 <svg data-toggle="modal" data-target="#ModalStatic" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-bar-chart-line" viewBox="0 0 16 16">
                                 <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-3 0V7H7v7h2zm-5 0v-3H2v3h2z"/>
                               </svg>
@@ -43,15 +43,18 @@
                                 </div>
                                 <div class="modal-body">
                                     <br>
-                                    <span class="nav-item" href="">Static 1 &#8195;</span>
+                                    <span class="nav-item" href="">Number of Attempts: {{statics}} &#8195;</span>
 
                                     <br><br>
-                                    <span class="nav-item">Static 2 &#8195; &#8195;</span>
+                                    <span class="nav-item">Percent Wins: &#8195; &#8195;</span>
 
 
                                     <br><br>
 
-                                    <span class="nav-item">Static 3 &#8195; &#8195;</span>
+                                    <span class="nav-item">Winning Streak: &#8195; &#8195;</span>
+
+                                    <br><br>
+                                    <span class="nav-item">Best Streak: &#8195; &#8195;</span>
 
                                     <br><br>
                                 </div>
@@ -62,6 +65,7 @@
                         </form>
                     </div>
                 </div>
+                {%endif%}
                 <!-- end Static Modal -->
 
                 <svg type="button" data-toggle="modal" data-target="#ModalSetting" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-gear" viewBox="0 0 16 16">

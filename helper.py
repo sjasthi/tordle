@@ -39,7 +39,13 @@ def getRandomWordByLength(length, language):
         return result
 
 
-params = {"length": 5, "attempt": 6, "language": "English", "url": "url_for('home')"}
+params = {
+    "length": 5,
+    "attempt": 6,
+    "language": "English",
+    "url": "url_for('home')",
+    "statics": {},
+}
 
 words = {
     "answer": "group",
@@ -50,6 +56,14 @@ words = {
     "word_len_test": True,
     "status": "PROCESS",
 }
+
+
+def getStatics(current_user, params):
+    records = Record.query.filter_by(user_id=current_user.id).order_by(Record.id).all()
+    if not records:
+        return None
+    record_str = "".join(map(lambda x: "1" if x.is_win else "0", records))
+    return record_str
 
 
 def update_data(params, request, words):
