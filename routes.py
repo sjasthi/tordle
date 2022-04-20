@@ -303,9 +303,8 @@ def user_list():
     if current_user.role != "admin":
         return abort(403)
     result = get_user_list(request)
-    if current_user.is_authenticated:
-        if request.json:
-            params = getStatics(current_user, request.json, db, params)
+    params = getParams()
+    params = getStatics(current_user, request.json, db, params)
     return render_template("user_list.html", result=result, params=params)
 
 
