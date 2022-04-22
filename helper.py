@@ -17,40 +17,86 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-def getRandomWordByLength(length, language):
+def getRandomWordByLength(request, current_user, length, language):
     if language == "English":
         results = (
             English.query.filter_by(length=length)
-            .filter(func.DATE(English.latest_play_time).isnot(date.today()))
+            .filter(
+                func.DATE(English.latest_play_time).isnot(date.today() - timedelta(1))
+            )
             .all()
         )
         if not results:
             return "#####"
-        result = random.choice(results)
-        english = English.query.filter_by(word=result.word).first()
-        english.latest_play_time = datetime.now()
-        db.session.commit()
-        return result.word
+        random.shuffle(results)
+        word = None
+        if current_user and current_user.is_authenticated:
+            # check the login user played the word in today or not:
+            for result in results:
+                key_str = f"{current_user.id} {result.word}"
+                if key_str not in session:
+                    word = result.word
+                    session[key_str] = datetime.now()
+                    break
+        else:
+            # check the unknow user played the word in today or not:
+            for result in results:
+                key_str = f"{request.remote_addr} {result.word}"
+                if key_str not in session:
+                    word = result.word
+                    session[key_str] = datetime.now()
+                    break
+        if word:
+            english = English.query.filter_by(word=word).first()
+            english.latest_play_time = datetime.now()
+            db.session.commit()
+            return word
+        return "#####"
     elif language == "Telugu":
-
         results = (
             Telugu.query.filter_by(length=length)
-            .filter(func.DATE(Telugu.latest_play_time).isnot(date.today()))
+            .filter(
+                func.DATE(Telugu.latest_play_time).isnot(date.today() - timedelta(1))
+            )
             .all()
         )
         if not results:
             return "#####"
-        result = random.choice(results)
-        telugu = Telugu.query.filter_by(word=result.word).first()
-        telugu.latest_play_time = datetime.now()
-        db.session.commit()
-        return result
+        random.shuffle(results)
+        word = None
+        if current_user and current_user.is_authenticated:
+            # check the login user played the word in today or not:
+            for result in results:
+                key_str = f"{current_user.id} {result.word}"
+                if key_str not in session:
+                    word = result.word
+                    session[key_str] = datetime.now()
+                    break
+        else:
+            # check the unknow user played the word in today or not:
+            for result in results:
+                key_str = f"{request.remote_addr} {result.word}"
+                if key_str not in session:
+                    word = result.word
+                    session[key_str] = datetime.now()
+                    break
+        print("Word: ")
+        print(word)
+        if word is not None:
+            telugu = Telugu.query.filter_by(word=word).first()
+            telugu.latest_play_time = datetime.now()
+            db.session.commit()
+            print(telugu)
+            return word
+    return "#####"
 
 
-english_random = getRandomWordByLength(params["length"], "English")
+# english_random = getRandomWordByLength(
+#     request=None, current_user=None, length=params["length"], language="English"
+# )
 words = {
-    "answer": english_random,
-    "solution": english_random,
+    "answer": "group",
+    "solution": "group",
     "result": [],
     "word_input": "",
     "wordCount": 0,
@@ -82,7 +128,7 @@ def getStatics(current_user, sendJson, db, params):
         print("Record: " + str(record))
     records = Record.query.filter_by(user_id=current_user.id).order_by(Record.id).all()
     if not records:
-        return None
+        return params
     # Number of Attempts:
     params["statics"]["numAttempts"] = len(records)
     # Percent Wins
@@ -143,14 +189,16 @@ def refess_data(params, request, words):
         #     words["solution"] = []
 
 
-def update_data(params, request, words):
+def update_data(current_user, params, request, words):
     print(request.form)
     params["length"] = int(request.form["length"] or params["length"])
     params["attempt"] = int(request.form["attempt"] or params["attempt"])
     params["url"] = None
     if request.form["language"] == "English":
         params["language"] = "English"
-        english_random = getRandomWordByLength(params["length"], "English")
+        english_random = getRandomWordByLength(
+            request, current_user, params["length"], "English"
+        )
         words["answer"] = english_random
         words["solution"] = english_random
     elif request.form["language"] == "Telugu":
@@ -160,10 +208,12 @@ def update_data(params, request, words):
         words["wordCount"] = 0
         words["status"] = "PROCESS"
         words["word_len_test"] = True
-        teluguObj = getRandomWordByLength(params["length"], "Telugu")
+        teluguObj = getRandomWordByLength(
+            request, current_user, params["length"], "Telugu"
+        )
         if teluguObj != "#####":
-            words["answer"] = teluguObj.word
-            words["solution"] = getTeluguLogicalChars(teluguObj.word)
+            words["answer"] = teluguObj
+            words["solution"] = getTeluguLogicalChars(teluguObj)
         else:
             words["answer"] = "#####"
             words["solution"] = []

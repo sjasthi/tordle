@@ -1,8 +1,17 @@
 import requests
 import json
 import random
-from datetime import datetime, date
-from flask import Flask, render_template, url_for, redirect, request, flash, abort
+from datetime import datetime, date, timedelta
+from flask import (
+    Flask,
+    render_template,
+    url_for,
+    redirect,
+    request,
+    flash,
+    abort,
+    session,
+)
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 
@@ -44,9 +53,11 @@ db = SQLAlchemy(app)
 login_manager = LoginManager(app)
 login_manager.login_view = "login"
 login_manager.login_message_category = "info"
+# session.permanent = True
+app.permanent_session_lifetime = timedelta(days=1)
 
-# flask-login for authen, role: admin and member, no role: anomou.
-# (Only Admin) User list, add new and modify user,
-# date for system word, for random and only one word per day.
-# implement Statistics: Number of attempts: Percent Wins: Winning Streak: Best Streak:
-# finished "Help and About"
+
+# @app.before_first_request
+# def make_session_permanent():
+#     session["ping"] = "pong"
+#     print("befor first request seesion: " + session["ping"])

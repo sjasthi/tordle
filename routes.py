@@ -18,7 +18,9 @@ def index():
         "url": None,
         "statics": {"numAttempts": 0, "percentWin": 0, "WinStreak": 0, "bestStreak": 0},
     }
-    english_random = getRandomWordByLength(params["length"], "English")
+    english_random = getRandomWordByLength(
+        request, current_user, params["length"], "English"
+    )
     words = {
         "answer": english_random,
         "solution": english_random,
@@ -28,6 +30,8 @@ def index():
         "word_len_test": True,
         "status": "PROCESS",
     }
+    ip = request.remote_addr
+    print(ip)
     if current_user.is_authenticated:
         params = getStatics(current_user, request.json, db, params)
     return render_template("index.html", words=words, params=params)
@@ -40,7 +44,7 @@ def home():
             params = getParams()
             if current_user.is_authenticated:
                 params = getStatics(current_user, request.json, db, params)
-            update_data(params, request, words)
+            update_data(current_user, params, request, words)
             return render_template("index.html", words=words, params=params)
         elif len(request.form) > 3:  # and params["language"] == "Telugu":
             params = getParams()
