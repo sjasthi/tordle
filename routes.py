@@ -176,12 +176,13 @@ def custom_word(word_id):
 def custom_word_post(word_id):
     if not current_user.is_authenticated:
         return redirect(url_for("login"))
-    if request.form:
-        if params["language"] == "Telugu":
-            words["word_input"] = request.form["word"]
-            getResult(words)
     params = getParams()
     params = getStatics(current_user, request.json, db, params)
+    if request.form:
+        refess_data(params, request, words)
+        words["word_input"] = request.form["word"]
+        if request.form["language"] == "Telugu":
+            getResult(words)
     return render_template("index.html", words=words, params=params)
 
 
@@ -339,3 +340,18 @@ def edit_user():
         return abort(403)
     handle_edit_user(request)
     return redirect(url_for("user_list"))
+
+
+@app.errorhandler(404)
+def error_404(error):
+    return render_template("errors/404.html", title="404", params=getParams()), 404
+
+
+@app.errorhandler(403)
+def error_403(error):
+    return render_template("errors/403.html", title="403", params=getParams()), 403
+
+
+@app.errorhandler(500)
+def error_500(error):
+    return render_template("errors/400.html", title="500", params=getParams()), 500

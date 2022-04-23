@@ -133,7 +133,7 @@ def getStatics(current_user, sendJson, db, params):
     params["statics"]["numAttempts"] = len(records)
     # Percent Wins
     params["statics"]["percentWin"] = (
-        str(
+        "{0:.2f}".format(
             100
             * (1.0 * sum(map(lambda x: 1 if x.is_win else 0, records)) / len(records))
         )
@@ -164,7 +164,6 @@ def getStatics(current_user, sendJson, db, params):
 
 
 def refess_data(params, request, words):
-    print(request.form)
     params["length"] = int(request.form["length"] or params["length"])
     params["attempt"] = int(request.form["attempt"] or params["attempt"])
     params["url"] = None
@@ -355,7 +354,7 @@ def generate_id(request, db, current_user):
         word_insert = (result["word_insert"]).lower()
         if not isEnglish(word_insert):
             flash("You have input correct English word!", "danger")
-            result["message"] = "You have input correct English word!"
+            result["message"] = "You must input correct English word!"
             return result
         temp = CustomWord.query.filter_by(word=word_insert).first()
         if not temp:
@@ -374,7 +373,7 @@ def generate_id(request, db, current_user):
         word_insert = result["word_insert"].strip()
         if not isTeluguWord(word_insert):
             flash("You have input correct Telugu word!", "danger")
-            result["message"] = "You have input correct Telugu word!"
+            result["message"] = "You must input correct Telugu word!"
             return result
         temp = CustomWord.query.filter_by(word=word_insert).first()
         if not temp:
