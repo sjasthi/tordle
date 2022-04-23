@@ -20,6 +20,18 @@ Requeir Admintor create new account to login to play "my word" option.
 
 public user for ICS499 class is: Email: "ics499@gmail.com" with password: "spring22"
 
+### How To run:
+install:
+    python 3.9.6
+    virtualenv 20.7.2
+    pip3 21.3.1
+-> get in the project folder "tordle"
+-> create the virtual environment, then activate it.
+-> using pip install all packages in the requrements.txt for the virtaul environment.
+-> in the virtaul environment, run the app by commandline: python3 main.py
+-> open the web browser to go the local URL: http://127.0.0.1:5000/
+-> enjoy the game.
+
 ### How To Play
 
 You can choose to play in English or Telugu.
