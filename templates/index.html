@@ -16,15 +16,17 @@
         <params.attempt and words.status=='PROCESS' %} {%if params.url%} <form action="{{ url_for('custom_word_post', word_id=params.url) }}" method="post">
             {%else%}
             <form id="submit" action="{{ url_for('home') }}" method="post">
-                <input> {%endif%}
+                {%endif%}
 
                 <fieldset class="form-group">
                     <input id="input" class="form-control form-control-lg" onblur="this.focus()" autofocus type="text" onKeyDown="teluguHandle" autocomplete="off" name="word">
-                </fieldset>
-                <div class="form-group">
                     <input type="hidden" name="language" value="{{params.language}}">
                     <input type="hidden" name="length" value="{{params.length}}">
                     <input type="hidden" name="attempt" value="{{params.attempt}}">
+                </fieldset>
+
+                <div class="form-group">
+
 
                     <button type="submit" id="submit" class="btn btn-outline-info"> SUBMIT</button> {% if words.word_len_test==False %}
                     <div class="requirements">

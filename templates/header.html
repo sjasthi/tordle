@@ -4,14 +4,19 @@
     <nav class="navbar navbar-expand-md navbar-dark bg-steel ">
 
         <div class="container">
-            <svg class="bi bi-bar-chart-line" data-toggle="modal" data-target="#ModalAbout" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="32" height="32" viewBox="0 0 32 32" style=" fill:currentColor"><path d="M 2 6 L 2 26 L 7 26 L 7 31.09375 L 8.625 29.78125 L 13.34375 26 L 30 26 L 30 6 Z M 4 8 L 28 8 L 28 24 L 12.65625 24 L 12.375 24.21875 L 9 26.90625 L 9 24 L 4 24 Z M 15 10 L 15 12 L 17 12 L 17 10 Z M 15 14 L 15 22 L 17 22 L 17 14 Z"></path></svg>            &ensp; &ensp; &ensp; <a href="{{ url_for('home') }}">Home</a> &ensp; {%if current_user.is_authenticated%} {%if current_user.role == 'admin'%}
+
+            <svg type="button" data-toggle="modal" data-target="#ModalHelp" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
+                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
+              </svg> &ensp; &ensp;
+            <svg type="button" class="bi bi-bar-chart-line" data-toggle="modal" data-target="#ModalAbout" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="32" height="32" viewBox="0 0 32 32" style=" fill:currentColor"><path d="M 2 6 L 2 26 L 7 26 L 7 31.09375 L 8.625 29.78125 L 13.34375 26 L 30 26 L 30 6 Z M 4 8 L 28 8 L 28 24 L 12.65625 24 L 12.375 24.21875 L 9 26.90625 L 9 24 L 4 24 Z M 15 10 L 15 12 L 17 12 L 17 10 Z M 15 14 L 15 22 L 17 22 L 17 14 Z"></path></svg>            &ensp; &ensp; &ensp; <a href="{{ url_for('home') }}">Home</a> &ensp; {%if current_user.is_authenticated%} {%if current_user.role == 'admin'%}
             <div class="dropdown">
                 <a class="dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Admin
                 </a>
                 <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <a class="dropdown-item" href="{{ url_for('custom_list') }}"> Custom List </a>
-                    <a class="dropdown-item" href="{{ url_for('system_list_search') }}"> System List </a>
-                    <a class="dropdown-item" href="{{ url_for('user_list') }}"> User List </a>
+                    <a class="dropdown-item" href="{{ url_for('custom_list') }}"> Custom Word List </a>
+                    <a class="dropdown-item" href="{{ url_for('system_list_search') }}"> System Word List </a>
+                    <a class="dropdown-item" href="{{ url_for('user_list') }}"> User Info List </a>
                 </div>
             </div>
             &ensp; {%endif%}
@@ -33,36 +38,32 @@
                 <!-- start Static Modal -->
                 <div class="modal fade" id="ModalStatic" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
                     <div class="modal-dialog" role="document">
-                        <form class="form-select form-select-lg mb-3" method="POST" action="{{ url_for('home') }}">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLongTitle">Statics</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLongTitle">Statics</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                   </button>
-                                </div>
-                                <div class="modal-body">
-                                    <br>
-                                    <span class="nav-item" href="">Number of Attempts: {{params.statics.numAttempts}} &#8195;</span>
-
-                                    <br><br>
-                                    <span class="nav-item">Percent Wins: {{params.statics.percentWin}}&#8195; &#8195;</span>
-
-
-                                    <br><br>
-
-                                    <span class="nav-item">Winning Streak: {{params.statics.WinStreak}} &#8195; &#8195;</span>
-
-                                    <br><br>
-                                    <span class="nav-item">Best Streak: {{params.statics.bestStreak}}&#8195; &#8195;</span>
-
-                                    <br><br>
-                                </div>
-                                <!-- <div class="modal-footer">
-                                                <button type="submit" class="btn btn-outline-info" href="">GO</button>
-                                            </div> -->
                             </div>
-                        </form>
+                            <div class="modal-body">
+                                <br>
+                                <span class="nav-item" href="">Number of Attempts: {{params.statics.numAttempts}} &#8195;</span>
+
+                                <br><br>
+                                <span class="nav-item">Percent Wins: {{params.statics.percentWin}}&#8195; &#8195;</span>
+
+
+                                <br><br>
+
+                                <span class="nav-item">Winning Streak: {{params.statics.WinStreak}} &#8195; &#8195;</span>
+
+                                <br><br>
+                                <span class="nav-item">Best Streak: {{params.statics.bestStreak}}&#8195; &#8195;</span>
+
+                                <br><br>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
                 {%endif%}
@@ -136,89 +137,84 @@
                 <!-- end Setting Modal -->
             </div>
             <div class="nav-left">
-                <!-- <svg type="button" data-toggle="modal" data-target="#ModalList" xmlns="http://www.w3.org/2000/svg" width="34" height="34" fill="currentColor" class="bi bi-list" viewBox="0 0 16 16">
-                                <path fill-rule="evenodd" d="M2.5 12a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5zm0-4a.5.5 0 0 1 .5-.5h10a.5.5 0 0 1 0 1H3a.5.5 0 0 1-.5-.5z"/>
-                              </svg> 
-                <span>
-                                &#8195;
-                            </span> -->
-                <!-- start List Modal -->
-                <div class="modal fade" id="ModalList" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
-                    <div class="modal-dialog" role="document">
-                        <form class="form-select form-select-lg mb-3" method="POST" action="{{ url_for('home') }}">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLongTitle">List</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                      </button>
-                                </div>
-                                <div class="modal-body">
-                                    <br>
-                                    <span class="nav-item" href="">List 1 &#8195;</span>
-
-                                    <br><br>
-                                    <span class="nav-item">List 2 &#8195; &#8195;</span>
-
-
-                                    <br><br>
-
-                                    <span class="nav-item">List 3 &#8195; &#8195;</span>
-
-                                    <br><br>
-                                </div>
-                                <!-- <div class="modal-footer">
-                                                    <button type="submit" class="btn btn-outline-info" href="">GO</button>
-                                                </div> -->
-                            </div>
-                        </form>
-                    </div>
-                </div>
-                <!-- end List Modal -->
-
-                <svg type="button" data-toggle="modal" data-target="#ModalHelp" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" class="bi bi-question-circle" viewBox="0 0 16 16">
-                                <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                <path d="M5.255 5.786a.237.237 0 0 0 .241.247h.825c.138 0 .248-.113.266-.25.09-.656.54-1.134 1.342-1.134.686 0 1.314.343 1.314 1.168 0 .635-.374.927-.965 1.371-.673.489-1.206 1.06-1.168 1.987l.003.217a.25.25 0 0 0 .25.246h.811a.25.25 0 0 0 .25-.25v-.105c0-.718.273-.927 1.01-1.486.609-.463 1.244-.977 1.244-2.056 0-1.511-1.276-2.241-2.673-2.241-1.267 0-2.655.59-2.75 2.286zm1.557 5.763c0 .533.425.927 1.01.927.609 0 1.028-.394 1.028-.927 0-.552-.42-.94-1.029-.94-.584 0-1.009.388-1.009.94z"/>
-                              </svg>
-
                 <!-- start ModalHelp Modal -->
                 <div class="modal fade" id="ModalHelp" tabindex="-1" role="dialog" aria-labelledby="exampleModalLongTitle" aria-hidden="true">
                     <div class="modal-dialog" role="document">
-                        <form class="form-select form-select-lg mb-3" method="POST" action="{{ url_for('home') }}">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="exampleModalLongTitle">Help</h5>
-                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="exampleModalLongTitle">Help</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                       </button>
-                                </div>
-                                <div class="modal-body">
-                                    <br>
-                                    <span class="nav-item" href="">Help 1 &#8195;</span>
-
-                                    <br><br>
-                                    <span class="nav-item">Help 2 &#8195; &#8195;</span>
-
-
-                                    <br><br>
-
-                                    <span class="nav-item">Help 3 &#8195; &#8195;</span>
-
-                                    <br><br>
-                                </div>
-                                <!-- <div class="modal-footer">
-                                                    <button type="submit" class="btn btn-outline-info" href="">GO</button>
-                                                </div> -->
                             </div>
+                            <div class="modal-body">
+
+                                <h3>How To Play</h3>
+                                <span class="nav-item">You can choose to play in English or Telugu. <br>
+                                     Guess the TORDLE in what length your setting. <br>
+                                    Each guess must input a valid word and correct legnth. <br>
+                                    Hit the enter or Click button to submit.<br>
+                                    After each guess, the color of the tiles will change to show how close your guess was to the word. </span>
+
+                                <br><br>
+                                <h3>English Tordle:</h3>
+                                <img src="{{ url_for('static', filename='img/g1.png') }}" alt="">
+                                <p class="nav-item">The letter 'g' is in the word and in the correct spot.</p>
+                                <img src="{{ url_for('static', filename='img/iy.png') }}" alt="">
+                                <p class="nav-item">The letter 'i' is in the word but in the wrong spot.</p>
+                                <img src="{{ url_for('static', filename='img/glayu1.png') }}" alt="">
+                                <p class="nav-item">The letter 'u' is not in the word in any spot.</p>
+                                <img src="{{ url_for('static', filename='img/allgreen.png') }}" alt="">
+                                <p class="nav-item">All letter green means You Win!</p>
+                                <h3>Telugu Tordle:</h3>
+                                <p class="nav-item">Exact Match Logic asame English, and more Base Match Logic's color: </p>
+                                <img src="{{ url_for('static', filename='img/blue.png') }}" alt="">
+                                <p class="nav-item">The letter 'డ' is Base Match in the word, and in the correct spot.</p>
+                                <img src="{{ url_for('static', filename='img/pink.png') }}" alt="">
+                                <p class="nav-item">The letter 'న్న' is Base Match in the word, but in the wrong spot.</p>
+
+                                <br><br>
+                                <hr size="2">
+                                <span class="nav-item ">A new TORDLE will be available each day! &#8195; &#8195;</span>
+
+                                <br><br>
+                            </div>
+
+                        </div>
                         </form>
                     </div>
                 </div>
                 <!-- end Help Modal -->
+
+                <!-- start ModalAbout Modal -->
+                <div class="modal fade " id="ModalAbout" tabindex="-1 " role="dialog " aria-labelledby="exampleModalLongTitle " aria-hidden="true ">
+                    <div class="modal-dialog " role="document ">
+                        <div class="modal-content ">
+                            <div class="modal-header ">
+                                <h5 class="modal-title " id="exampleModalLongTitle ">About</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                            </div>
+                            <div class="modal-body ">
+                                <br>
+                                <span class="nav-item " href=" ">Tordle Game: Telugu + English, the version of  <a href="https://www.nytimes.com/games/wordle/index.html ">Wordle Game</a>, which cloning from web app of New York Times </span>
+                                <br><br>
+                                <span class="nav-item ">Final Project Of ICS499 Class : Software Engineering and Capstone Project,  from Metropolitan State University.</span>
+                                <br><br>
+                                <span class="nav-item ">Instuctor: Siva R Jasthi, Ph.D</span>
+                                <br><br>
+                                <span class="nav-item ">Deverlop By Student: Nalongsone Danddank</span>
+                                <br><br>
+                            </div>
+                        </div>
+                        </form>
+                    </div>
+                </div>
+                <!-- end About Modal -->
             </div>
-
-    </nav>
-
-    </div>
+        </div>
     </nav>
 </header>
 <br><br> {% block body_content %} {% endblock body_content %} {% endblock content %}

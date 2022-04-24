@@ -405,7 +405,7 @@ a:visited {
 /* Modal styles */
 
 .modal .modal-dialog {
-    max-width: 400px;
+    max-width: 600px;
 }
 
 .modal .modal-header,

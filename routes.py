@@ -18,7 +18,9 @@ def index():
         "url": None,
         "statics": {"numAttempts": 0, "percentWin": 0, "WinStreak": 0, "bestStreak": 0},
     }
-    english_random = getRandomWordByLength(params["length"], "English")
+    english_random = getRandomWordByLength(
+        request, current_user, params["length"], "English"
+    )
     words = {
         "answer": english_random,
         "solution": english_random,
@@ -28,6 +30,8 @@ def index():
         "word_len_test": True,
         "status": "PROCESS",
     }
+    ip = request.remote_addr
+    print(ip)
     if current_user.is_authenticated:
         params = getStatics(current_user, request.json, db, params)
     return render_template("index.html", words=words, params=params)
@@ -38,7 +42,9 @@ def home():
     if request.form:
         if len(request.form) == 3:
             params = getParams()
-            update_data(params, request, words)
+            if current_user.is_authenticated:
+                params = getStatics(current_user, request.json, db, params)
+            update_data(current_user, params, request, words)
             return render_template("index.html", words=words, params=params)
         elif len(request.form) > 3:  # and params["language"] == "Telugu":
             params = getParams()
@@ -138,10 +144,9 @@ def my_word_post():
         "attempt": 6,
         "language": "English",
         "url": None,
+        "statics": {"numAttempts": 0, "percentWin": 0, "WinStreak": 0, "bestStreak": 0},
     }
-    if current_user.is_authenticated:
-        if request.json:
-            params = getStatics(current_user, request.json, db, params)
+    params = getStatics(current_user, request.json, db, params)
     return render_template("my_word.html", params=params, result=result)
 
 
@@ -171,13 +176,13 @@ def custom_word(word_id):
 def custom_word_post(word_id):
     if not current_user.is_authenticated:
         return redirect(url_for("login"))
+    params = getParams()
+    params = getStatics(current_user, request.json, db, params)
     if request.form:
-        if params["language"] == "Telugu":
-            words["word_input"] = request.form["word"]
+        refess_data(params, request, words)
+        words["word_input"] = request.form["word"]
+        if request.form["language"] == "Telugu":
             getResult(words)
-    if current_user.is_authenticated:
-        if request.json:
-            params = getStatics(current_user, request.json, db, params)
     return render_template("index.html", words=words, params=params)
 
 
@@ -189,6 +194,8 @@ def custom_list():
     if current_user.role != "admin":
         return abort(403)
     result = get_custom_list(request)
+    params = getParams()
+    params = getStatics(current_user, request.json, db, params)
     return render_template("custom_list.html", result=result, params=params)
 
 
@@ -222,6 +229,8 @@ def system_list_search():
     if current_user.role != "admin":
         return abort(403)
     result = get_system_list_search(request)
+    params = getParams()
+    params = getStatics(current_user, request.json, db, params)
     return render_template("system_list.html", result=result, params=params)
 
 
@@ -331,3 +340,18 @@ def edit_user():
         return abort(403)
     handle_edit_user(request)
     return redirect(url_for("user_list"))
+
+
+@app.errorhandler(404)
+def error_404(error):
+    return render_template("errors/404.html", title="404", params=getParams()), 404
+
+
+@app.errorhandler(403)
+def error_403(error):
+    return render_template("errors/403.html", title="403", params=getParams()), 403
+
+
+@app.errorhandler(500)
+def error_500(error):
+    return render_template("errors/400.html", title="500", params=getParams()), 500
