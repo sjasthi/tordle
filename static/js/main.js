@@ -1,3 +1,6 @@
+/**
+ * """Author: Nalongsone Danddank, Final Project, begin on Feb 2 2022, end on April 27, 2022, ICS499 METRO STATE """
+ */
 COLOR_CLASS = {
     0: "absent",
     1: "correct",
