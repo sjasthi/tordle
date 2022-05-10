@@ -1,3 +1,4 @@
+"""Author: Nalongsone Danddank, Final Project, begin on Feb 2 2022, end on April 27, 2022, ICS499 METRO STATE """
 import requests
 import json
 import random
